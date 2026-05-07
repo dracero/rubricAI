@@ -8,7 +8,16 @@
  * 4. Loading state management for AI-generation buttons
  */
 document.addEventListener("click", e => {
-    const link = e.target.closest("a.opt, a.s0-card, a.sug-card, a.areteia-btn, button.areteia-btn, a.fb-btn, a.areteia-dot");
+    // Robust link detection even if innerHTML was changed by loading states (detaching target)
+    const path = e.composedPath ? e.composedPath() : [e.target];
+    let link = null;
+    for (const el of path) {
+        if (el.matches && el.matches("a.opt, a.s0-card, a.sug-card, a.areteia-btn, button.areteia-btn, a.fb-btn, a.areteia-dot")) {
+            link = el;
+            break;
+        }
+    }
+    
     if (!link || link.classList.contains("external")) return;
 
     // Skip the ingest and publish buttons — handled natively for security (sesskey)

@@ -42,7 +42,6 @@ class step7 {
         $corr_label = encaje_table::LABELS[$correction] ?? $correction;
         $corr_icon = encaje_table::ICONS[$correction] ?? '📄';
 
-        echo html_writer::tag('span', 'Paso 2 — Resultado Final', ['class' => 'areteia-tag t-ia']);
         echo html_writer::tag('p', 'Instrumento de corrección finalizado', ['class' => 'areteia-stitle']);
 
         // Guard
@@ -208,7 +207,6 @@ class step7 {
         $exported       = session_manager::get('exported', 0);
         $cmid           = session_manager::get('cmid', 0);
 
-        echo html_writer::tag('span', 'Paso 7 — Resultado final', ['class' => 'areteia-tag t-ia']);
         echo html_writer::tag('p', 'Instrumento de evaluación finalizado', ['class' => 'areteia-stitle']);
 
         // Export success banner

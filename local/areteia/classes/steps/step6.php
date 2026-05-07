@@ -45,7 +45,6 @@ class step6 {
 
         // Guard: require an evaluation instrument to exist
         if (empty($instrument)) {
-            echo html_writer::tag('span', 'Paso 1 — Instrumento de Corrección', ['class' => 'areteia-tag t-ia']);
             echo html_writer::tag('p', 'Selecciona el instrumento de corrección', ['class' => 'areteia-stitle']);
             echo html_writer::start_tag('div', ['class' => 'alert alert-warning', 'style' => 'margin-top:20px;']);
             echo html_writer::tag('strong', '⚠️ No se encontró un instrumento de evaluación.');
@@ -65,7 +64,6 @@ class step6 {
             $correction_content = '';
         }
 
-        echo html_writer::tag('span', 'Paso 1 — Instrumento de Corrección', ['class' => 'areteia-tag t-ia']);
         echo html_writer::tag('p', 'Selecciona y genera el instrumento de corrección', ['class' => 'areteia-stitle']);
 
         // Summary card of the evaluation instrument
@@ -78,9 +76,7 @@ class step6 {
 
         // Show objectives if available
         $d2 = session_manager::get('d2', '');
-        if (!empty($d2)) {
-            echo html_writer::tag('div', '🎯 ' . mb_strimwidth($d2, 0, 150, '...'), ['style' => 'font-size:12px; color:#777; margin-top:8px;']);
-        }
+
         echo html_writer::end_tag('div');
 
         step_renderer::render_rag_info();
@@ -444,7 +440,6 @@ class step6 {
             $selection_raw = session_manager::get('final_selection_json', '');
         }
 
-        echo html_writer::tag('span', 'Paso 6 — Selección Final (JSON)', ['class' => 'areteia-tag t-ia']);
         echo html_writer::tag('p', 'Estructura técnica del instrumento generado', ['class' => 'areteia-stitle']);
         echo html_writer::tag('p', 
             'Esta es la representación estructurada de los ítems que has seleccionado. Este JSON será utilizado para construir la rúbrica y exportar a Moodle.',

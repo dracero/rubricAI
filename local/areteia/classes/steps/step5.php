@@ -71,7 +71,6 @@ class step5 {
             }
         }
 
-        echo html_writer::tag('span', 'Paso 5 — Selección de Ítems', ['class' => 'areteia-tag t-ia']);
         echo html_writer::tag('p', 'Revisa y selecciona los mejores ítems para tu evaluación', ['class' => 'areteia-stitle']);
         
         step_renderer::render_rag_info();

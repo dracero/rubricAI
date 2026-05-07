@@ -365,7 +365,7 @@ class step4 {
             ]);
         }
 
-        echo html_writer::tag('strong', $name, ['style' => 'margin-bottom:8px; display:block;']);
+        echo html_writer::tag('strong', $name, ['style' => 'font-size:14px; margin-bottom:8px; display:block;']);
         
         // Official definition from master catalog (Deterministic)
         if (!empty($s['definition'])) {
@@ -375,7 +375,7 @@ class step4 {
         }
 
         echo html_writer::tag('div', '<strong>Fundamentación:</strong> ' . ($s['why'] ?? ''), [
-            'style' => 'font-size:11px; font-weight:normal; opacity:0.8; line-height:1.4;'
+            'style' => 'font-size:13px; font-weight:normal; opacity:0.8; line-height:1.4;'
         ]);
 
         echo html_writer::end_tag($is_locked ? 'div' : 'a');
