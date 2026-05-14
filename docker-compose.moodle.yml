@@ -1,4 +1,4 @@
-name: areteia
+name: areteia_moodle
 
 services:
   # Nginx Proxy Manager for SSL
@@ -7,7 +7,6 @@ services:
     container_name: moodle_npm
     restart: unless-stopped
     ports:
-      - '80:80'
       - '81:81'
       - '443:443'
     volumes:
@@ -22,7 +21,6 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
-
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -59,25 +57,24 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DB_PORT=${DB_PORT}
-
+      - ARETEIA_AI_URL=${ARETEIA_AI_URL}
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
-      # - moodledata:/var/www/moodledata
       - ./moodledata:/var/www/moodledata
-      # - ./areteia_sync:/var/www/moodledata/areteia_sync:ro
       - moodle_core:/var/www/html
       - ./local/areteia:/var/www/html/local/areteia
       - ./conf/moodle.ini:/usr/local/etc/php/conf.d/moodle.ini
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   nginx:
     image: nginx:alpine
     container_name: moodle_web
     restart: unless-stopped
-    # Port 8080 remains for local testing if NPM is not used/configured yet
     ports:
       - "8080:80"
     volumes:
@@ -86,25 +83,19 @@ services:
     depends_on:
       - moodle
 
-  python_rag:
-    build: ./areteia_ai
-    container_name: python_rag
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
-    # environment:
-      # - ARETEIA_SYNC_PATH=/var/www/moodledata/areteia_sync
-    env_file: .env
-    volumes:
-      - ./areteia_ai:/app
-      - ./moodledata:/var/www/moodledata
-      - hf_cache:/root/.cache/huggingface
-
 volumes:
   db_data:
+    external: true
+    name: areteia_db_data
   redis_data:
-  # moodledata:
+    external: true
+    name: areteia_redis_data
   npm_data:
+    external: true
+    name: areteia_npm_data
   npm_letsencrypt:
+    external: true
+    name: areteia_npm_letsencrypt
   moodle_core:
-  hf_cache:
+    external: true
+    name: areteia_moodle_core

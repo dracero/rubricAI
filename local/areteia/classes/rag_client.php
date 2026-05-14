@@ -12,7 +12,25 @@ defined('MOODLE_INTERNAL') || die();
 class rag_client {
 
     /** @var string Base URL of the Python service. */
-    private const BASE = 'http://python_rag:8000';
+    private static function get_base_url(): string {
+        // 1. Try to read from a local .ini file (easier to manage for the user)
+        $ini_path = __DIR__ . '/../areteia.ini';
+        if (file_exists($ini_path)) {
+            $config = parse_ini_file($ini_path);
+            if (!empty($config['areteia_ai_url'])) {
+                return rtrim($config['areteia_ai_url'], '/');
+            }
+        }
+
+        // 2. Fallback to Environment Variable
+        $env_url = getenv('ARETEIA_AI_URL');
+        if ($env_url) {
+            return rtrim($env_url, '/');
+        }
+
+        // 3. Last resort default for Docker environments
+        return 'http://host.docker.internal:8000';
+    }
 
     // ------------------------------------------------------------------
     // Public API (one method per endpoint)
@@ -34,13 +52,41 @@ class rag_client {
      *
      * @param int $course_id
      * @param array $selected_files (Optional) list of selected file paths
+     * @param string $base_sync_dir
      * @return object|null  { status, chunks, ... }
      */
-    public static function ingest(int $course_id, array $selected_files = []): ?object {
-        $response = self::post('/ingest', json_encode([
-            'course_id' => $course_id,
-            'selected_files' => $selected_files
-        ]), 600, 30);
+    public static function ingest(int $course_id, array $selected_files = [], string $base_sync_dir = ''): ?object {
+        $post_data = ['course_id' => $course_id];
+        
+        if (!empty($base_sync_dir) && file_exists($base_sync_dir)) {
+            $idx = 0;
+            
+            // If no specific files are provided, we scan the directory to send EVERYTHING
+            if (empty($selected_files)) {
+                $directory = new \RecursiveDirectoryIterator($base_sync_dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+                $iterator  = new \RecursiveIteratorIterator($directory);
+                foreach ($iterator as $file) {
+                    if ($file->isDir()) continue;
+                    $relative_path = str_replace('\\', '/', substr($file->getPathname(), strlen($base_sync_dir) + 1));
+                    $mime = mime_content_type($file->getPathname()) ?: 'application/octet-stream';
+                    $post_data["files[$idx]"] = curl_file_create($file->getPathname(), $mime, $relative_path);
+                    $idx++;
+                }
+            } else {
+                foreach ($selected_files as $relative_path) {
+                    $file_path = $base_sync_dir . '/' . $relative_path;
+                    if (file_exists($file_path)) {
+                        $mime = mime_content_type($file_path) ?: 'application/octet-stream';
+                        // curl_file_create allows us to send the file via multipart/form-data
+                        // The 3rd parameter sets the 'filename' property in the HTTP request to the relative path
+                        $post_data["files[$idx]"] = curl_file_create($file_path, $mime, $relative_path);
+                        $idx++;
+                    }
+                }
+            }
+        }
+
+        $response = self::post_multipart('/ingest', $post_data, 600, 30);
         return @json_decode($response);
     }
     
@@ -50,7 +96,7 @@ class rag_client {
      * @param int $course_id
      */
     public static function delete(int $course_id): void {
-        $ch = curl_init(self::BASE . '/ingest/' . $course_id);
+        $ch = curl_init(self::get_base_url() . '/ingest/' . $course_id);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -65,7 +111,7 @@ class rag_client {
      * @return array  ['data' => ?object, 'raw' => string|false]
      */
     public static function status(int $course_id): array {
-        $ch = curl_init(self::BASE . '/status/' . $course_id);
+        $ch = curl_init(self::get_base_url() . '/status/' . $course_id);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         $raw = curl_exec($ch);
@@ -118,7 +164,7 @@ class rag_client {
      * @return object|null  { status, instruments: [{name, definition}] }
      */
     public static function get_instruments(): ?object {
-        $ch = curl_init(self::BASE . '/instruments');
+        $ch = curl_init(self::get_base_url() . '/instruments');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         $raw = curl_exec($ch);
@@ -146,7 +192,7 @@ class rag_client {
         int $timeout = 60,
         int $connect_timeout = 20
     ): string {
-        $ch = curl_init(self::BASE . $endpoint);
+        $ch = curl_init(self::get_base_url() . $endpoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
@@ -163,6 +209,35 @@ class rag_client {
         
         if ($response === false) {
             // Log native curl error for debugging
+            error_log("AreteIA RAG CURL Error ($endpoint): " . $error);
+            return '';
+        }
+        
+        return $response;
+    }
+
+    /**
+     * Execute a POST request with multipart/form-data against the Python service.
+     */
+    private static function post_multipart(
+        string $endpoint,
+        array $post_data,
+        int $timeout = 60,
+        int $connect_timeout = 20
+    ): string {
+        $ch = curl_init(self::get_base_url() . $endpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        // Do NOT set Content-Type to JSON. cURL automatically handles the multipart boundaries.
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $connect_timeout);
+        
+        $response = curl_exec($ch);
+        $error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($response === false) {
             error_log("AreteIA RAG CURL Error ($endpoint): " . $error);
             return '';
         }

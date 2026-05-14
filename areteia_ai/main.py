@@ -1,5 +1,6 @@
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request, UploadFile
 from pydantic import BaseModel
+import shutil
 import logging
 import json
 import os
@@ -72,33 +73,64 @@ async def sync_course(request: SyncRequest):
 
 
 @app.post("/ingest")
-async def ingest_course(request: IngestRequest, background_tasks: BackgroundTasks):
+async def ingest_course(request: Request, background_tasks: BackgroundTasks):
     """
     Trigger ingestion for a course folder in the background.
     """
-    if not request.course_id:
+    form_data = await request.form()
+    course_id_str = form_data.get("course_id")
+    
+    if not course_id_str:
         return {"status": "error", "message": "course_id is required"}
+        
+    course_id = int(course_id_str)
 
     from rag.pipeline import run_ingestion
+    from rag.store import get_course_dir
+    
+    course_dir = get_course_dir(course_id)
+    if os.path.exists(course_dir):
+        shutil.rmtree(course_dir)
+    os.makedirs(course_dir, exist_ok=True)
+    
+    selected_files = []
+    for key, value in form_data.multi_items():
+        # Check if it's a file by looking for the filename attribute (duck typing)
+        filename = getattr(value, 'filename', None)
+        if filename:
+            rel_path = filename.lstrip('/')
+            selected_files.append(rel_path)
+            
+            dest_path = os.path.join(course_dir, rel_path)
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            
+            with open(dest_path, "wb") as buffer:
+                shutil.copyfileobj(value.file, buffer)
+            logging.info(f"Saved uploaded file: {rel_path} to {dest_path}")
+    
+    if not selected_files:
+        logging.warning(f"No files were received in the multipart request for course {course_id}")
+    else:
+        logging.info(f"Received and saved {len(selected_files)} files for course {course_id}")
     
     # Initialize progress
-    INGESTION_PROGRESS[request.course_id] = {
+    INGESTION_PROGRESS[course_id] = {
         "progress": 0, 
         "message": "Iniciando...",
-        "selected_files": request.selected_files
+        "selected_files": selected_files
     }
     
     def progress_callback(val, msg):
-        INGESTION_PROGRESS[request.course_id] = {
+        INGESTION_PROGRESS[course_id] = {
             "progress": val, 
             "message": msg,
-            "selected_files": request.selected_files
+            "selected_files": selected_files
         }
 
-    background_tasks.add_task(run_ingestion, request.course_id, progress_callback=progress_callback)
+    background_tasks.add_task(run_ingestion, course_id, progress_callback=progress_callback)
     return {
         "status": "started",
-        "message": f"Ingestion triggered in background for course {request.course_id}"
+        "message": f"Ingestion triggered in background for course {course_id}"
     }
 
 @app.post("/search")
@@ -353,7 +385,9 @@ async def generate_endpoint(request: GenerateRequest):
     Main generative endpoint for Steps 4, 5, and 6.
     """
     try:
-        from llm import generate_completion
+        # from llm import generate_completion
+        from llm import _llm_instance
+        # Singleton instance initialized on module load
         
         prompt, system_prompt, schema = await _prepare_prompt_data(request)
         
@@ -364,7 +398,7 @@ async def generate_endpoint(request: GenerateRequest):
             return prompt
 
         # 4. Call LLM
-        response_text, usage = generate_completion(prompt, system_prompt)
+        response_text, usage = _llm_instance.generate_completion(prompt, system_prompt)
         
         if not response_text:
             return {"status": "error", "message": "AI generation failed"}

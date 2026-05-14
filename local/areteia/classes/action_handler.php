@@ -136,7 +136,7 @@ class action_handler {
             error_log("[AreteIA] WARNING: selected_files is empty — ingesting ALL files.");
         }
 
-        $res_data = rag_client::ingest($course_id, $selected_files ?? []);
+        $res_data = rag_client::ingest($course_id, $selected_files ?? [], $base_sync_dir);
 
         // Determine ingestion state: 1=success, 2=empty, 3=processing, -1=error
         if ($res_data && $res_data->status == 'success') {

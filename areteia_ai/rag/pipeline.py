@@ -4,7 +4,7 @@ from pathlib import Path
 from rag.store import save_index
 from rag.utils import extract_pdf, extract_docx, extract_pptx, embed_text_chunks
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-BASE_PATH = os.getenv("ARETEIA_SYNC_PATH", "/var/www/moodledata/areteia_sync")
+BASE_PATH = os.getenv("ARETEIA_SYNC_PATH", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sync"))
 
 
 def run_ingestion(course_id: int,  chunk_size=1000, overlap=250, progress_callback=None):

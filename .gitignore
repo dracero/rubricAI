@@ -4,3 +4,5 @@ moodledata/
 *.pyc
 areteia_ai/.fastembed_cache/
 *.md
+areteia_ai/data/sync/*
+123docker-compose
