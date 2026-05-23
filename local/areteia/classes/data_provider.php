@@ -915,14 +915,44 @@ class data_provider {
         $plugin->value = '1';
         $DB->insert_record('assign_plugin_config', $plugin);
 
-        // 3. Enable file submission
-        $plugin2 = new \stdClass();
-        $plugin2->assignment = $assign->id;
-        $plugin2->plugin = 'file';
-        $plugin2->subtype = 'assignsubmission';
-        $plugin2->name = 'enabled';
-        $plugin2->value = '1';
-        $DB->insert_record('assign_plugin_config', $plugin2);
+        // 3. Enable file submission with proper limit configurations
+        $maxbytes = isset($course->maxbytes) ? (int)$course->maxbytes : 0;
+        if ($maxbytes <= 0) {
+            global $CFG;
+            $maxbytes = !empty($CFG->maxbytes) ? (int)$CFG->maxbytes : 52428800; // 50MB fallback
+        }
+
+        $plugin_file_enabled = new \stdClass();
+        $plugin_file_enabled->assignment = $assign->id;
+        $plugin_file_enabled->plugin = 'file';
+        $plugin_file_enabled->subtype = 'assignsubmission';
+        $plugin_file_enabled->name = 'enabled';
+        $plugin_file_enabled->value = '1';
+        $DB->insert_record('assign_plugin_config', $plugin_file_enabled);
+
+        $plugin_file_max = new \stdClass();
+        $plugin_file_max->assignment = $assign->id;
+        $plugin_file_max->plugin = 'file';
+        $plugin_file_max->subtype = 'assignsubmission';
+        $plugin_file_max->name = 'maxfilesubmissions';
+        $plugin_file_max->value = '5'; // Allow up to 5 files
+        $DB->insert_record('assign_plugin_config', $plugin_file_max);
+
+        $plugin_file_size = new \stdClass();
+        $plugin_file_size->assignment = $assign->id;
+        $plugin_file_size->plugin = 'file';
+        $plugin_file_size->subtype = 'assignsubmission';
+        $plugin_file_size->name = 'maxsubmissionsizebytes';
+        $plugin_file_size->value = (string)$maxbytes;
+        $DB->insert_record('assign_plugin_config', $plugin_file_size);
+
+        $plugin_file_types = new \stdClass();
+        $plugin_file_types->assignment = $assign->id;
+        $plugin_file_types->plugin = 'file';
+        $plugin_file_types->subtype = 'assignsubmission';
+        $plugin_file_types->name = 'filetypeslist';
+        $plugin_file_types->value = '*'; // Allow all file types
+        $DB->insert_record('assign_plugin_config', $plugin_file_types);
         
         // 4. Add course module
         $cm = new \stdClass();
