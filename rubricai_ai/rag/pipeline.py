@@ -4,7 +4,7 @@ from pathlib import Path
 from rag.store import save_index
 from rag.utils import extract_pdf, extract_docx, extract_pptx, embed_text_chunks
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-BASE_PATH = os.getenv("ARETEIA_SYNC_PATH", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sync"))
+BASE_PATH = os.getenv("RUBRICAI_SYNC_PATH", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sync"))
 
 
 def run_ingestion(course_id: int,  chunk_size=1000, overlap=250, progress_callback=None):
@@ -30,7 +30,7 @@ def run_ingestion(course_id: int,  chunk_size=1000, overlap=250, progress_callba
         update_p(0, f"Error en rglob")
         return 0
 
-    files_to_process = [f for f in all_files if f.is_file() and f.suffix.lower() in ['.pdf', '.docx', '.pptx']]
+    files_to_process = [f for f in all_files if f.is_file() and f.suffix.lower() in ['.pdf', '.docx', '.pptx', '.txt']]
     total_files = len(files_to_process)
     
     for idx, file_path in enumerate(files_to_process):
@@ -47,6 +47,9 @@ def run_ingestion(course_id: int,  chunk_size=1000, overlap=250, progress_callba
                 text = extract_docx(file_path)
             elif ext == ".pptx":
                 text = extract_pptx(file_path)
+            elif ext == ".txt":
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                    text = f.read()
             else:
                 continue
         except Exception as e:

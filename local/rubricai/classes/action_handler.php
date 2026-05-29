@@ -518,11 +518,21 @@ class action_handler {
         $result = rag_client::evaluate($course_id, $rubric_id, $payload);
 
         if ($result) {
-            session_manager::set('compare_score', isset($result->overall_score) ? (float)$result->overall_score : 50.0);
-            session_manager::set('compare_holistic', $result->holistic_evaluation ?? 'No disponible.');
-            session_manager::set('compare_format', $result->format_evaluation ?? 'No disponible.');
-            session_manager::set('compare_recommendations', isset($result->recommendations) ? json_encode($result->recommendations) : '[]');
+            $score = isset($result->overall_score) ? (float)$result->overall_score : 50.0;
+            $holistic = $result->holistic_evaluation ?? 'No disponible.';
+            $format = $result->format_evaluation ?? 'No disponible.';
+            $recs = isset($result->recommendations) ? (array)$result->recommendations : [];
+
+            // Save to Moodle database (config_plugins)
+            session_manager::save_audit_results($course_id, $score, $holistic, $format, $recs, $rubric_id);
+
+            // Also keep in session for immediate compatibility
+            session_manager::set('compare_score', $score);
+            session_manager::set('compare_holistic', $holistic);
+            session_manager::set('compare_format', $format);
+            session_manager::set('compare_recommendations', json_encode($recs));
             session_manager::set('compare_rubric_id', $rubric_id);
+
             $redir = new \moodle_url($base_url, ['step' => 8, 'action' => 'compare', 'compared' => 1]);
         } else {
             $redir = new \moodle_url($base_url, ['step' => 8, 'action' => 'compare', 'error' => 'evaluation_failed']);

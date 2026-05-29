@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "--- Iniciando Despliegue de AreteIA ---"
+echo "--- Iniciando Despliegue de RubricAI ---"
 
 # 1. Obtener los últimos cambios de Git
 echo "Pulling latest changes from Git..."
@@ -17,4 +17,4 @@ docker compose exec moodle php admin/cli/purge_caches.php
 
 # 4. Estado de los contenedores
 docker compose ps
-echo "--- Despliegue Completado en areteia.site ---"
+echo "--- Despliegue Completado en rubricai.site ---"

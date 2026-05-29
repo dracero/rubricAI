@@ -76,10 +76,42 @@ class OpenAIProvider(LLMProvider):
             logging.exception("Exception during OpenAI call")
             return None, None
 
+class GoogleProvider(LLMProvider):
+    def __init__(self):
+        import openai
+        # Use standard OpenAI client configured for Google Gemini API endpoint
+        self.client = openai.OpenAI(
+            api_key=os.getenv("GOOGLE_API_KEY"),
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        )
+        self.model = os.getenv("GOOGLE_MODEL", "gemini-2.5-flash")
+
+    def generate_completion(self, prompt: str, system_prompt: str) -> tuple[str, dict]:
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            content = response.choices[0].message.content
+            usage = {
+                "input_tokens": response.usage.prompt_tokens if response.usage else 0,
+                "output_tokens": response.usage.completion_tokens if response.usage else 0,
+                "total_tokens": response.usage.total_tokens if response.usage else 0
+            }
+            return content, usage
+        except Exception as e:
+            logging.exception("Exception during Google Gemini call")
+            return None, None
+
 def get_llm_provider() -> LLMProvider:
     provider_name = os.getenv("LLM_PROVIDER", "dashscope").lower()
     if provider_name == "openai":
         return OpenAIProvider()
+    if provider_name == "google" or provider_name == "gemini":
+        return GoogleProvider()
     # Default to DashScope
     return DashScopeProvider()
 

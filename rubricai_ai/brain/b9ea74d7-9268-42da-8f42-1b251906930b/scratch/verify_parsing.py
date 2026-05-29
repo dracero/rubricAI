@@ -3,17 +3,16 @@ import os
 import re
 from pathlib import Path
 
-# Add the areteia_ai directory to sys.path so we can import modules
-sys.path.append('/home/tomaspemora/AreteIA/areteia_ai')
+# Add the parent directory to sys.path so we can import modules
+parent_dir = Path(__file__).resolve().parents[1]
+sys.path.append(str(parent_dir))
 
 try:
     from rag.utils import get_instrument_list
     print("Testing get_instrument_list()...")
     
-    # Mocking the path since the script runs outside docker
     # We need to ensure the path in get_instrument_list exists in this environment
-    # Let's read the file directly first to see if it's there
-    md_path = Path("/home/tomaspemora/AreteIA/areteia_ai/rag/documentos_maestros/instrumentos_de_evaluacion.md")
+    md_path = parent_dir / "rag" / "documentos_maestros" / "instrumentos_de_evaluacion.md"
     
     if md_path.exists():
         content = md_path.read_text(encoding="utf-8")

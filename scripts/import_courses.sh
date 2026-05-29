@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-BACKUP_SRC="/run/media/dracero/08c67654-6ed7-4725-b74e-50f29ea60cb2/pythonAI-Others/AreteIA/Cursos - Copias de seguridad-20260523T223114Z-3-001/Cursos - Copias de seguridad"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKUP_SRC="$SCRIPT_DIR/../Cursos - Copias de seguridad-20260523T223114Z-3-001/Cursos - Copias de seguridad"
 
 echo "=== Paso 1: Creando carpeta de backups dentro del contenedor Moodle ==="
 docker compose exec moodle mkdir -p /var/www/moodledata/backups

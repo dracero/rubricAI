@@ -9,7 +9,7 @@ defined('MOODLE_INTERNAL') || die();
 class data_provider {
  
     /** Allowed file extensions for RAG processing */
-    private const ALLOWED_EXTS = ['pdf', 'ppt', 'pptx', 'docx', 'doc'];
+    private const ALLOWED_EXTS = ['pdf', 'ppt', 'pptx', 'docx', 'doc', 'txt'];
 
     /** Allowed module types for building the library */
     private const RESOURCE_MODULES = ['resource', 'folder', 'page', 'url', 'book', 'label', 'imscp', 'assign', 'forum', 'quiz'];
@@ -115,12 +115,50 @@ class data_provider {
             $section_name = clean_param(self::get_section_name_clean($course, $section), PARAM_FILE);
             $section_folder_name = $section->section . '_' . ($section_name ?: 'Section');
             
-            if (!empty($modinfo->sections[$section->section])) {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
                     $cm = $modinfo->get_cm($cmid);
                     if (!$cm->uservisible) continue;
                     if (!in_array($cm->modname, self::RESOURCE_MODULES)) continue;
 
+                    $activity_name = clean_param($cm->name, PARAM_FILE);
+                    $activity_folder_name = $cm->id . '_' . ($activity_name ?: 'Activity');
+
+                    // A. Export virtual text file representing activity instructions/questions
+                    $activity_text = self::get_activity_text($cm);
+                    if (!empty($activity_text)) {
+                        $v_filename = clean_param($cm->name, PARAM_FILE);
+                        $v_filename = trim($v_filename, ' .-_');
+                        if (empty($v_filename)) {
+                            $v_filename = 'actividad_' . $cm->id;
+                        }
+                        $v_filename .= '.txt';
+
+                        $reldata = [
+                            'filename' => $v_filename,
+                            'mimetype' => 'text/plain',
+                            'size'     => strlen($activity_text),
+                            'section'  => $section_name,
+                            'module'   => $cm->name,
+                            'modname'  => $cm->modname
+                        ];
+
+                        if ($extract_to_sync_dir) {
+                            $target_dir = $base_sync_dir . '/' . $section_folder_name . '/' . $activity_folder_name;
+                            if (!file_exists($target_dir)) {
+                                mkdir($target_dir, 0777, true);
+                            }
+                            $localpath = $target_dir . '/' . $v_filename;
+                            try {
+                                file_put_contents($localpath, $activity_text);
+                            } catch (\Exception $e) {
+                                file_put_contents($CFG->dataroot . '/rubricai_sync/debug.txt', "Error writing virtual file for " . $cm->name . ": " . $e->getMessage() . "\n", FILE_APPEND);
+                            }
+                            $reldata['localpath'] = $localpath;
+                        }
+                        $res[] = $reldata;
+                    }
+
+                    // B. Export actual physical files in this module's context
                     $mod_context = \context_module::instance($cm->id);
                     
                     // Fetch all files associated with this module's context, regardless of component/filearea
@@ -148,9 +186,6 @@ class data_provider {
                             continue;
                         }
 
-                        $activity_name = clean_param($cm->name, PARAM_FILE);
-                        $activity_folder_name = $cm->id . '_' . ($activity_name ?: 'Activity');
-                        
                         $reldata = [
                             'filename' => $file->get_filename(),
                             'mimetype' => $file->get_mimetype(),
@@ -181,7 +216,6 @@ class data_provider {
                         $res[] = $reldata;
                     }
                 }
-            }
         }
         
         return $res;
@@ -263,6 +297,25 @@ class data_provider {
                     'type'  => 'activity',
                     'files' => []
                 ];
+
+                // Generate virtual file node representing the activity's details/description
+                $activity_text = self::get_activity_text($cm);
+                if (!empty($activity_text)) {
+                    $v_filename = clean_param($cm->name, PARAM_FILE);
+                    $v_filename = trim($v_filename, ' .-_');
+                    if (empty($v_filename)) {
+                        $v_filename = 'actividad_' . $cm->id;
+                    }
+                    $v_filename .= '.txt';
+
+                    $activity_node['files'][] = [
+                        'id'      => 'virtual_' . $cm->id,
+                        'name'    => $v_filename,
+                        'type'    => 'file',
+                        'relpath' => $section->section . '_' . clean_param($section_name, PARAM_FILE) . '/' .
+                                     $cm->id . '_' . clean_param($cm->name, PARAM_FILE) . '/' . $v_filename
+                    ];
+                }
 
                 // Use DB to get all files in this module's context, regardless of filearea
                 try {
@@ -1268,5 +1321,91 @@ class data_provider {
             }
         }
         return $name;
+    }
+
+    /**
+     * Get the text content representing a Moodle activity (assignment, quiz, forum, page, book, etc.)
+     *
+     * @param object $cm
+     * @return string
+     */
+    public static function get_activity_text($cm): string {
+        global $DB;
+        $text = "Actividad: " . $cm->name . "\nTipo: " . $cm->modname . "\n\n";
+
+        try {
+            if ($cm->modname === 'assign') {
+                $record = $DB->get_record('assign', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Instrucciones de la tarea:\n" . strip_tags($record->intro);
+                }
+            } else if ($cm->modname === 'forum') {
+                $record = $DB->get_record('forum', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Descripción del foro:\n" . strip_tags($record->intro);
+                }
+            } else if ($cm->modname === 'page') {
+                $record = $DB->get_record('page', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Descripción:\n" . strip_tags($record->intro) . "\n\nContenido de la página:\n" . strip_tags($record->content);
+                }
+            } else if ($cm->modname === 'url') {
+                $record = $DB->get_record('url', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Descripción:\n" . strip_tags($record->intro) . "\nURL: " . $record->externalurl;
+                }
+            } else if ($cm->modname === 'book') {
+                $record = $DB->get_record('book', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Libro: " . $record->name . "\n" . strip_tags($record->intro) . "\n\nCapítulos:\n";
+                    $chapters = $DB->get_records('book_chapters', ['bookid' => $record->id], 'pagenum');
+                    if ($chapters) {
+                        foreach ($chapters as $ch) {
+                            $text .= "\nTítulo: " . $ch->title . "\n" . strip_tags($ch->content);
+                        }
+                    }
+                }
+            } else if ($cm->modname === 'quiz') {
+                $record = $DB->get_record('quiz', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Descripción del cuestionario:\n" . strip_tags($record->intro) . "\n\nPreguntas:\n";
+                    $has_question_refs = $DB->get_manager()->table_exists('question_references');
+                    if ($has_question_refs) {
+                        $sql = "SELECT q.id, q.name, q.questiontext
+                                FROM {quiz_slots} slot
+                                JOIN {question_references} qref ON qref.itemid = slot.id
+                                JOIN {question_bank_entries} qbe ON qbe.id = qref.questionbankentryid
+                                JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id
+                                JOIN {question} q ON q.id = qv.questionid
+                                WHERE slot.quizid = ? AND qv.status = 'ready'";
+                        $qrecords = $DB->get_records_sql($sql, [$record->id]);
+                    } else {
+                        $sql = "SELECT q.id, q.name, q.questiontext
+                                FROM {quiz_slots} slot
+                                JOIN {question} q ON q.id = slot.questionid
+                                WHERE slot.quizid = ?";
+                        $qrecords = $DB->get_records_sql($sql, [$record->id]);
+                    }
+                    if ($qrecords) {
+                        foreach ($qrecords as $qr) {
+                            $text .= "- " . $qr->name . ": " . strip_tags($qr->questiontext) . "\n";
+                        }
+                    }
+                }
+            } else if ($cm->modname === 'label') {
+                $record = $DB->get_record('label', ['id' => $cm->instance]);
+                if ($record) {
+                    $text .= "Contenido de la etiqueta:\n" . strip_tags($record->intro);
+                }
+            } else {
+                if ($cm->content) {
+                    $text .= "Detalles:\n" . strip_tags($cm->content);
+                }
+            }
+        } catch (\Exception $e) {
+            $text .= "\nError al obtener detalles: " . $e->getMessage();
+        }
+
+        return trim($text);
     }
 }

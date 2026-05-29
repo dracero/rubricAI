@@ -1,4 +1,4 @@
-name: areteia_moodle
+name: rubricai_moodle
 
 services:
   # Nginx Proxy Manager for SSL
@@ -57,7 +57,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DB_PORT=${DB_PORT}
-      - ARETEIA_AI_URL=${ARETEIA_AI_URL}
+      - RUBRICAI_AI_URL=${RUBRICAI_AI_URL}
     depends_on:
       db:
         condition: service_healthy

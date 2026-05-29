@@ -23,7 +23,7 @@ class rag_client {
         }
 
         // 2. Fallback to Environment Variable
-        $env_url = getenv('ARETEIA_AI_URL');
+        $env_url = getenv('RUBRICAI_AI_URL');
         if ($env_url) {
             return rtrim($env_url, '/');
         }

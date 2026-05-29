@@ -70,7 +70,7 @@ class SearchRequest(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "AreteIA AI Service is running"}
+    return {"message": "RubricAI AI Service is running"}
 
 
 @app.post("/sync")

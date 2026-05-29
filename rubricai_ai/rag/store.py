@@ -2,7 +2,7 @@ import faiss
 import os
 import pickle
 
-BASE_PATH = os.getenv("ARETEIA_SYNC_PATH", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sync"))
+BASE_PATH = os.getenv("RUBRICAI_SYNC_PATH", os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sync"))
 
 
 

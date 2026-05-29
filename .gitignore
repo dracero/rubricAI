@@ -2,8 +2,9 @@
 src/
 moodledata/
 *.pyc
-areteia_ai/.fastembed_cache/
+rubricai_ai/.fastembed_cache/
 *.md
-areteia_ai/data/sync/*
+rubricai_ai/data/
 123docker-compose
+rubricai_plugin.zip
 areteia_plugin.zip

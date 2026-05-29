@@ -108,6 +108,16 @@ class Neo4jClient:
         description = rubric_data.get("description", "")
         criteria = rubric_data.get("criteria", [])
         
+        # 0. Delete ALL existing rubrics, criteria, and levels to ensure only ONE active rubric exists
+        self.query(
+            """
+            MATCH (r:Rubric)
+            OPTIONAL MATCH (r)-[:HAS_CRITERION]->(c:Criterion)
+            OPTIONAL MATCH (c)-[:HAS_LEVEL]->(l:Level)
+            DETACH DELETE r, c, l
+            """
+        )
+        
         # 1. Create Rubric Node
         self.query(
             """

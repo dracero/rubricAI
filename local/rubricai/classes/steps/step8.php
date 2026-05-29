@@ -55,15 +55,28 @@ class step8 {
             echo html_writer::tag('div', '❌ ' . $msg, ['class' => 'alert alert-danger', 'style' => 'padding: 15px; border-radius: 8px; margin-bottom: 20px; background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.2); color: #ea868f;']);
         }
 
-        // Check if compared results are in session
-        $compared = optional_param('compared', 0, PARAM_INT) || (session_manager::get('compare_score') !== null);
+        // Try to load results from database first
+        $db_results = session_manager::load_audit_results($courseid);
+        
+        if ($db_results !== null) {
+            $score = $db_results['score'];
+            $holistic = $db_results['holistic'];
+            $format_desc = $db_results['format'];
+            $recs = $db_results['recommendations'];
+            $rubric_id = $db_results['rubric_id'];
+            $compared = true;
+        } else {
+            $compared = (session_manager::get('compare_score') !== null);
+            if ($compared) {
+                $score = session_manager::get('compare_score', 0.0);
+                $holistic = session_manager::get('compare_holistic', '');
+                $format_desc = session_manager::get('compare_format', '');
+                $recs = json_decode(session_manager::get('compare_recommendations', '[]'), true);
+                $rubric_id = session_manager::get('compare_rubric_id', '');
+            }
+        }
 
         if ($compared) {
-            $score = session_manager::get('compare_score', 0.0);
-            $holistic = session_manager::get('compare_holistic', '');
-            $format_desc = session_manager::get('compare_format', '');
-            $recs = json_decode(session_manager::get('compare_recommendations', '[]'), true);
-            $rubric_id = session_manager::get('compare_rubric_id', '');
 
             // Render score card
             echo html_writer::start_tag('div', ['class' => 'rubricai-results-dashboard', 'style' => 'display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 30px;']);
@@ -178,6 +191,7 @@ class step8 {
 
         // Reset recalculation param if requested
         if (optional_param('recalc', 0, PARAM_INT)) {
+            session_manager::clear_audit_results($courseid);
             session_manager::clear('compare_score');
             session_manager::clear('compare_holistic');
             session_manager::clear('compare_format');
