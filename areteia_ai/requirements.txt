@@ -11,3 +11,5 @@ langchain==0.0.202
 dashscope
 python-dotenv
 openai
+neo4j
+

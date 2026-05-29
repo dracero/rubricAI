@@ -1,4 +1,5 @@
 from fastapi import FastAPI, BackgroundTasks, Request, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import shutil
 import logging
@@ -12,15 +13,25 @@ from schemas import (
     InstrumentDesign, 
     RubricDesign,
     CorrectionDesign,
-    FeedbackClassification
+    FeedbackClassification,
+    EvaluateRequest
 )
 from rag.utils import get_instrument_list
 import json
 import re
 
 
-app = FastAPI(title="AreteIA AI Service")
+app = FastAPI(title="RubricAI AI Service")
 logging.basicConfig(level=logging.INFO)
+
+# Enable CORS so Astro frontend (port 4321) and Moodle (port 8080) can call the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event():
@@ -494,3 +505,93 @@ async def delete_embeddings(course_id: int):
             os.remove(path)
     INGESTION_PROGRESS.pop(course_id, None)
     return {"status": "success", "message": "Embeddings deleted"}
+
+
+# --- RubricAI Neo4j & Multi-Agent Endpoints ---
+
+@app.post("/rubrics")
+def create_rubric(rubric: dict):
+    """
+    Creates or updates a rubric in the Neo4j database.
+    """
+    from neo4j_client import get_neo4j_client
+    client = get_neo4j_client()
+    if not client or not client.initialized:
+        return {"status": "error", "message": "Neo4j is not connected. Check environment variables."}
+    
+    try:
+        rubric_id = client.save_rubric(rubric)
+        return {"status": "success", "rubric_id": rubric_id}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.get("/rubrics")
+def list_rubrics():
+    """
+    Retrieves all rubrics stored in Neo4j.
+    """
+    from neo4j_client import get_neo4j_client
+    client = get_neo4j_client()
+    if not client or not client.initialized:
+        return []
+    
+    try:
+        return client.list_rubrics()
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/rubrics/{rubric_id}")
+def get_rubric(rubric_id: str):
+    """
+    Retrieves a full rubric from Neo4j.
+    """
+    from neo4j_client import get_neo4j_client
+    client = get_neo4j_client()
+    if not client or not client.initialized:
+        return {"status": "error", "message": "Neo4j not connected"}
+    
+    try:
+        rubric = client.get_rubric(rubric_id)
+        if not rubric:
+            return {"status": "error", "message": "Rubric not found"}
+        return rubric
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.post("/evaluate")
+def evaluate_course(request: EvaluateRequest):
+    """
+    Triggers multi-agent course comparison against a rubric.
+    """
+    from agents import MultiAgentCoordinator
+    try:
+        coordinator = MultiAgentCoordinator()
+        result = coordinator.evaluate_course(
+            course_id=request.course_id,
+            rubric_id=request.rubric_id,
+            course_data=request.course_data
+        )
+        return result
+    except Exception as e:
+        logging.exception("Error in /evaluate endpoint")
+        return {"status": "error", "message": str(e)}
+
+
+@app.get("/ontology")
+def get_ontology():
+    """
+    Returns nodes and edges representing the pedagogical ontology from Neo4j.
+    """
+    from neo4j_client import get_neo4j_client
+    client = get_neo4j_client()
+    if not client or not client.initialized:
+        return {"nodes": [], "edges": []}
+    
+    try:
+        return client.get_ontology_graph()
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+

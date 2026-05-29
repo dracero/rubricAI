@@ -94,3 +94,23 @@ class GenerateRequest(BaseModel):
     correction_type: str = ""       # clave_correccion, lista_cotejo, escala_valoracion, rubrica
     correction_label: str = ""       # Human-readable label
     quiz_items_json: str = ""        # JSON of quiz items for context
+
+class EvaluateRequest(BaseModel):
+    course_id: int
+    rubric_id: str
+    course_data: dict
+
+class Recommendation(BaseModel):
+    element: str
+    type: str
+    issue: str
+    change: str
+
+class EvaluateResponse(BaseModel):
+    course_id: int
+    rubric_id: str
+    overall_score: float
+    holistic_evaluation: str
+    format_evaluation: str
+    recommendations: List[Recommendation]
+
