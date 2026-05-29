@@ -633,9 +633,10 @@ function initIngestionForm() {
 
         // Show loading state gracefully, without killing the submit event
         if (btn) {
-            btn.innerHTML = '⏳ Construyendo...';
-            btn.style.pointerEvents = 'none';
-            btn.style.opacity = '0.7';
+            setTimeout(() => {
+                btn.innerHTML = '⏳ Construyendo...';
+                btn.disabled = true;
+            }, 0);
         }
     };
 }
