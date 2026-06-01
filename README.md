@@ -212,13 +212,13 @@ HF_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # Configuración del Proveedor de LLM (Google Gemini Studio)
 LLM_PROVIDER=google
-GOOGLE_API_KEY=AIzaSyCSDIfMG27aelF718QXYAT6N6UQKuKyya4
+GOOGLE_API_KEY=XXXXX
 GOOGLE_MODEL=gemini-2.5-flash
 
 # Base de Datos de Grafos Neo4j (Aura Cloud)
 NEO4J_URI=neo4j+s://aa211074.databases.neo4j.io
 NEO4J_USERNAME=aa211074
-NEO4J_PASSWORD=ScjS1V2PWXHyMweXQuWLUcdu63ahCN_2U3Qxhym7iWg
+NEO4J_PASSWORD=XXXXXX
 NEO4J_DATABASE=aa211074
 AURA_INSTANCEID=aa211074
 AURA_INSTANCENAME=Instance01-barto
