@@ -1,0 +1,503 @@
+<!--Modifica el theme-->
+#page-navbar .breadcrumb li>{
+background-color: #28AFB0;
+    border-color: #28AFB0;
+}
+body{
+background-color: #EDEDEE!important;
+    ;
+}
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+#page-course-view-topics .course-content .section .sectionname, 
+#page-course-view-topics .course-content .single-section .sectionname
+{
+	display:none;
+}
+
+<!--Curso-->
+.destacado {
+	background-color: #963484;
+    padding: 40px;
+    max-width: 380px;
+    margin-left: 340px;
+    bottom: 0;
+    transform: translateY(-50%);
+	color:#fff;
+}
+.cuadrolinea {
+    border: 4px solid #19647E;
+    padding: 40px;
+}
+
+.cuadrolinea h3 {
+    font-family: Flama Medium,sans-serif;
+    font-size: 32px;
+    line-height: 45px;
+    letter-spacing: .5px;
+}
+.cuadrolinea .image-side {
+    overflow: hidden;
+    -ms-grid-row: 2;
+    -ms-grid-row-span: 2;
+    grid-row: span 2/4;
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 3;
+    grid-column: span 3/4;
+    z-index: 2;
+    position: relative;
+    max-height: 60vh;
+}
+.destacado h1 {
+	font-size: 60px;
+	line-height: 68px;
+	letter-spacing: 1px;
+	background-color: #963484;
+	padding: 40px;
+	max-width: 70%;
+	margin-left: 340px;
+	bottom: 0;
+	transform: translateY(-50%);
+	color: #fff;
+	font-family: Calibri, Helvetica, sans-serif;
+	font-weight: bold;
+}
+.titlepp-container {
+    background-color: #00a884;
+    border: 1px solid #00a884;
+    box-shadow: none;
+    padding: 40px;
+    max-width: 680px;
+    margin-left: 40px;
+    bottom: 0;
+    transform: translateY(50%);
+}
+.textocentrado {
+	font-size: 1.2em;
+	text-decoration: none;
+	text-align: justify; 
+	margin: 15px 15%;  
+}
+.cuadro{
+	letter-spacing: 1px;
+	padding: 50px;
+	margin-left: 0px;
+	bottom: 0;
+	color: #000;
+}
+.cuadro h1{
+	font-size: 3.2em;
+	font-family: Calibri, Helvetica, sans-serif;
+	font-weight: bold;
+	color:#FFF;
+}
+.naranja {
+	background-color: #FFC857;
+	}
+.azul {
+	background-color: #2455A6;
+	}
+.violeta {
+	background-color: #963484;
+	color:#fff;
+	}
+.verde {
+	background-color: #11b6be;
+	}	
+.colorverde {
+	color: #11b6be;
+	}
+.colornaranja, .naranja h1 {
+	color: #FFC857;
+	}
+.colorazul {
+	color: #2455A6;
+	}
+.colorvioleta {
+	color: #963484;
+		}
+			
+.naranja h1 {
+	color: #000;
+	}
+.narrativas img, .propuestas img{
+	max-width:820px;
+	}
+
+.propuestas .cuadro {
+	   /* padding: 60px 100px 60px 15%;*/
+	}		
+.img100 {
+    width: 100%;
+    height: auto;
+}
+.img80 {
+    width:80%;
+    height: auto;
+}
+
+.cuadroazul{
+	letter-spacing: 1px;
+	padding: 50px;
+	max-width: 780px;
+	margin-left: 0px;
+	bottom: 0;
+	color: #000;
+	background-color: #FFF;
+}
+.bordevioleta{
+	border: 10px solid #963484;
+	
+}
+.cuadroazul h1{
+	font-size: 60px;
+	line-height: 68px;
+	font-family: Calibri, Helvetica, sans-serif;
+	font-weight: bold;
+	color:#FFF;
+	background-color:#963484;
+	text-align:center;
+}
+.cuadroazul h2,h3{
+	font-size: 60px;
+	line-height: 68px;
+	font-family: Calibri, Helvetica, sans-serif;
+	font-weight: bold;
+	color:#963484;
+}
+.cuadroazul h3{
+	font-size: 50px;
+}
+.blanco {
+	background-color: #FFF;
+	margin-left: 20px;
+    transform: translateY(-20%);
+	}
+.aperturas .cuadro {
+	z-index:-10;
+	}
+.media {
+	height:250px;
+	}
+.blanco i {
+	font-size:1.5em;
+	}
+.blanco .redes, .redes {
+	font-size:1.5em;
+	margin-left: 30px;
+	}			
+.puntos .cuadro {
+	   /* padding: 60px 100px 60px 15%;*/
+	}		
+.puntos .blanco {
+    transform: translateY(-10%)translateX(-25%);
+	}
+.puntos i, .puntos a {
+    color: #11b6be;
+	font-size: 2em;
+    letter-spacing: normal;
+	}	
+.puntos a {
+    font-size: 1.5em;
+    }			
+.aqui{
+	letter-spacing: 1px;
+	padding: 50px;
+	margin-left: 0px;
+	bottom: 0;
+	color: #000;
+}
+.aqui h1{
+	width: fit-content;
+	border-left: 10px solid #963484;
+	padding: 15px;
+	font-weight: bold;
+}
+.ubicacion a{
+	color:#963484;
+}
+.aqui h2{
+	color:#2455A6;
+	font-size:2em;
+}
+.video{
+	width:80%;
+	margin-top: 40px;
+	text-align:center;
+	margin:0 auto;
+	position: relative;
+	top: -240px; 
+}
+.cuadrovideo{
+	width:45%;
+	height:400px;
+	background-color:#963484;
+	}
+.ubicacion{
+	/*box-shadow: 0 8px 6px 0 rgba(0,0,0,0.2), 0 6px 0px 0 rgba(0,0,0,0.9);*/
+	border-radius: 12px;
+	padding:10px;
+	margin:10px;
+	color:#963484;
+	background-color: #E4E4E6;
+	width: fit-content;
+	    float: left;
+}
+
+.orientaciones h4{
+    font-family: Calibri, Helvetica, sans-serif;
+    font-weight: bold;
+    color: #963484;
+	font-size:3em;
+	}
+.flechitas {
+	margin:10px 20px;
+	margin-top: 20px!important;
+}	
+.boton {
+	width:50%;
+   	max-width: 230px;
+	float: left;
+}
+.titulounidad {
+    border-left: 10px solid #963484;
+    padding: 15px;
+    font-weight: bold;
+	font-size:3em;
+	}
+.fechaunidad {
+	border-left: 10px solid #963484;
+	padding: 15px;
+	font-weight: bold;
+	font-size: 1.5em;
+	margin-bottom: 20px;
+	background-color: #F2F2F2;
+	margin-top: 0px;
+	color: #999;
+}
+.nroounidad {
+	font-size:5em;
+	text-align:right;
+	}
+.bt-rectangulo {
+	padding:10px;
+	color:#000;
+	margin:10px;
+	border:solid #000 2px;
+	width: fit-content;
+	font-size:2em;
+	min-width:350px;
+	}	
+.bt-rectangulo a {
+	color:#000;
+	}
+.bt-rectangulo a:hover {
+	background-color:#000;
+	color:#fff;
+	}
+.bt-actividad {
+	padding:10px;
+	color:#FFC857;
+	margin:20px 0px;
+	border:solid #FFC857 2px;
+	min-width: 250px;
+	font-size:2em;
+	min-width:350px;
+	}
+
+.bt-actividad a{
+	color:#FFC857;
+	}
+
+.bt-actividad-grupal-uno {
+		padding:10px;
+		color:#11b6be;
+		margin:20px 0px;
+		border:solid #11b6be 2px;
+		min-width: 250px;
+		font-size:2em;
+		min-width:350px;
+	}
+
+.bt-actividad-grupal-uno a{
+		color:#11b6be;
+	}
+
+.seminarios{
+	margin:10px;
+	}
+.seminarios p{
+	font-size:1em;
+	color:#000;
+	margin: 15% 0px;
+    font-weight: bold;	
+	}
+.seminarios .fecha{
+	color:#963484;
+	}	
+.seminarios img{
+	margin:10px;
+	float:left;
+	}
+.fondoazul{
+	background-repeat: repeat-y;
+	background-image: url(https://campus.citep.rec.uba.ar/repository/coursefilearea/file.php/1/edet/img_curso/fondoazul.JPG);
+	}
+.fondoverde{
+	background-repeat: repeat-y;
+	background-image: url(https://campus.citep.rec.uba.ar/repository/coursefilearea/file.php/1/edet/img_curso/fondoverde.JPG);
+	}
+.fondovioleta{
+	background-repeat: repeat-y;
+	background-image: url(https://campus.citep.rec.uba.ar/repository/coursefilearea/file.php/1/edet/img_curso/fondovioleta.JPG);
+	}
+.fondovioleta img, .fondoverde img, .fondoazul img{
+	width:100%;
+	height:auto;
+	}
+.celular{	
+   height: auto;
+    width: 50%;
+    position: relative;
+    top: -210px;
+   }	
+.cuadro-recurso{
+	border-right: solid 2px #000;
+	border-bottom: solid 2px #000;
+	padding:0px 0px 20px 0px;
+	margin:10px;
+	background-color:#FFF;
+	min-height:450px;
+}
+.cuadro-recurso p{
+	padding:20px;
+}
+.cuadro-recurso img{
+	padding:0px;
+	width:100%;
+	height:auto;
+}	
+.cuadro-recurso h1{
+	padding:10px;
+	margin:0px;
+}
+.cuadro-recurso h4 {
+	border-right: solid 2px #000;
+	border-bottom: solid 2px #000;
+	font-weight: bold;
+	padding:10px;
+	background-color:#FFF;
+	width: 60%;
+	position:absolute; z-index:2; left:1em; top:-0.5em;
+}
+.titulo-comunidad{
+	border-right: solid 2px #000;
+	border-bottom: solid 2px #000;
+	font-weight: bold;
+	padding:10px;
+	background-color:#FFF;
+	width: 40%;
+	position:relative;
+	font-size:3em;
+	z-index:2; left:1em; top:-0.5em;
+}
+.cuadro-recurso a.entrar{
+	font-weight: bold;
+	font-variant: small-caps;
+	font-size:1em;
+	border-bottom: solid 2px #000;
+	padding:10px;
+	color: #000;
+}	
+.fondorecursos {
+	background-color:#2455A6;
+    padding: 50px 10px 10px 10px;
+	}
+.colorblanco {
+	background-color:#fff;
+	border: solid 4px #000;
+	}
+.recursosverde {
+	background-color:#11b6be;
+    padding: 50px 10px 10px 10px;
+	}	
+.redes img {
+	width:50px;
+	height:auto;
+	}													
+@media screen and (max-width:1000px){
+.destacado {
+	padding: 10px;
+    width:100%;
+}
+.destacado h1, .cuadro h1 {
+	font-size: 1.5em;
+	line-height: 1em;
+	padding: 5px;
+	margin-left:0px;
+}
+.orientaciones h4, .cuadroazul h3, .cuadroazul h2, .cuadroazul h1{
+	font-size:1.5em;
+	}
+.media {
+    height: auto;
+}	
+.cuadroazul{
+	padding: 5px;
+	max-width: 780px;;
+}
+.bordevioleta{
+	border: 3px solid #963484;
+}
+
+.col-3 {
+	background-color: #11b6be;
+}
+
+.col-6, .col-xs-6 {
+    flex: auto;
+    max-width: auto;
+}
+.course-content ul.section{
+	margin:0px;
+	}
+.blanco, .cuadro, .celular {
+    transform: none;
+	margin:0px;
+	padding:5px;
+	}	
+.boton {
+	width:100%;
+	margin:0px;
+	}
+.image-side {
+    width: 100%;
+    height: auto;
+}	
+.puntos .blanco {
+    transform: none;
+	}	
+.bt-rectangulo {
+	font-size:1.5em;
+	}	
+.textocentrado, .puntos i, .puntos a  {
+	font-size: 0.8em;
+}
+.fondovioleta img, .fondoverde img, .fondoazul img{
+	width:100%;
+	}
+.titulo-comunidad{
+	width: 100%;
+	font-size:1.5em;
+}	
+.titulounidad {
+	font-size:2em;
+	}
+.cuadro-recurso h4 {
+	margin-top:10px;		
+}
+.cuadro-recurso{
+	min-height:auto;
+}

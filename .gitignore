@@ -1,11 +1,14 @@
 .env
-src/
-moodledata/
+moodledata/secret/
+moodledata/sessions/
+moodledata/cache/
+moodledata/localcache/
+moodledata/muc/
+moodledata/temp/
+moodledata/trashdir/
 *.pyc
-rubricai_ai/.fastembed_cache/
-*.md
-rubricai_ai/data/
-123docker-compose
-rubricai_plugin.zip
-areteia_plugin.zip
-Cursos - Copias de seguridad-20260523T223114Z-3-001/
+**/__pycache__/
+moodledata/backups/copia_de_seguridad-moodle2-course-1188-edetns-elg_ed_25-20260522-1153-nu.mbz
+moodledata/backups/sem6_edet.mbz
+moodledata/backups/copia_de_seguridad-moodle2-course-1276-tecde_ed_26-20260522-1200-nu.mbz
+moodledata/backups/wetransfer_entre_cables-mbz_2026-05-21_1821.zip

@@ -1,0 +1,495 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  /* header con posición relativa, medidas fijas y fondo de color */
+  .header {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    background-color: #111216;
+  }
+
+.card.card-block, #page-enrol-users #filterform.card-block, #page-enrol-users #page-enrol-users #filterform, .que .history.card-block, .que #page-enrol-users #filterform.history, #page-enrol-users .que #filterform.history, .userprofile .profile_tree section.card-block, .userprofile .profile_tree #page-enrol-users section#filterform, #page-enrol-users .userprofile .profile_tree section#filterform, .groupinfobox.card-block, #page-enrol-users #filterform.groupinfobox, .well.card-block, #page-enrol-users #filterform.well, #page-enrol-users #filterform.card, #page-enrol-users .que .history#filterform, .que #page-enrol-users .history#filterform, #page-enrol-users .groupinfobox#filterform, #page-enrol-users .well#filterform, .card .card-block, #page-enrol-users #filterform .card-block, #page-enrol-users #filterform #page-enrol-users #filterform, #page-enrol-users #page-enrol-users #filterform #filterform, .que .history .card-block, .que .history #page-enrol-users #filterform, #page-enrol-users .que .history #filterform, .userprofile .profile_tree section .card-block, .userprofile .profile_tree section #page-enrol-users #filterform, #page-enrol-users .userprofile .profile_tree section #filterform, .groupinfobox .card-block, .groupinfobox #page-enrol-users #filterform, #page-enrol-users .groupinfobox #filterform, .well .card-block, .well #page-enrol-users #filterform, #page-enrol-users .well #filterform, .card #page-enrol-users #filterform, #page-enrol-users .card #filterform, .card .card-body, #page-enrol-users #filterform .card-body, #page-enrol-users #filterform .userprofile .profile_tree section, .userprofile .profile_tree #page-enrol-users #filterform section, .que .history .card-body, .que .history .userprofile .profile_tree section, .userprofile .profile_tree .que .history section, .userprofile .profile_tree section .card-body, .userprofile .profile_tree section .userprofile .profile_tree section, .userprofile .profile_tree .userprofile .profile_tree section section, .groupinfobox .card-body, .groupinfobox .userprofile .profile_tree section, .userprofile .profile_tree .groupinfobox section, .well .card-body, .well .userprofile .profile_tree section, .userprofile .profile_tree .well section, .card .userprofile .profile_tree section, .userprofile .profile_tree .card section {
+    background-color:#111216;
+}
+
+#page-course-view-topics .course-content .single-section .sectionname, #page-course-view-topics .course-content .section .sectionname {
+    background: #111216;
+    border-color:#111216;
+    color: #fff;
+    border-style: solid;
+    border-width: 5px 5px 5px 0;
+}
+
+#page-wrapper::after {
+    display: none;
+}
+
+#page.container-fluid {
+    background-color: #111216;
+}
+
+.flex-menu-bio {
+    display: flex;
+    background-color:#111216;
+    justify-content:center;
+    flex-wrap: wrap;
+    margin: auto;
+    width: 90%;
+    padding: 10px;
+}
+
+.flex-menu-bio > div {
+margin-right: 15px;
+}
+
+/* Información con posición absoluta
+.header__introduction {
+    position: absolute;
+/* Todos los límites en cero para ocupar todo el espacio disponible
+    top: 0;
+    bottom: 0;
+    width: 90%;
+    left: 0;
+    right: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+  }
+/* Esto no parece ser necesario, se adapta al espacio disponible */
+
+.background {
+    background-color:#111216;
+    display: block;
+    height: 70%;
+}
+
+.dialogos {
+    font-family: 'Open Sans', sans-serif;
+    text-align: justify;
+    font-size: 16px;
+    line-height: 24px;
+    color: #fff;
+    margin-left: 70px;
+    margin-right: 80px;
+    }
+
+#page-navbar {
+    background-color: #111216; 
+}
+
+#page-navbar .breadcrumb li>* {
+    position: relative;
+    padding: 0.4em 0.8em 0.4em 1.5em;
+    color: #ffffff;
+    background-color:#111216;
+}
+#contenedor-link {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+ margin-left:10%;
+ margin-right:10%;
+}
+
+#contenedor-link > div {
+  width: 50%;
+}
+/* .flex-wrap {
+    flex-wrap: wrap!important;
+    background-color: #212529;
+}*/
+  .titulo1 {
+    font-family: Open Sans;
+	margin-left:10%;
+   line-height: 70px;
+    font-size: 50px;
+    font-weight: 800;
+	color: #efa355;
+}
+ .titulo2 {
+    font-family: Open Sans;
+   line-height: 37px;
+    font-size: 37px;
+	margin-left:10%;
+    font-weight: 800;
+	color: #efa355;
+}
+ .titulo3 {
+    font-family: Open Sans;
+   line-height: 24px;
+    font-size: 20px;
+    font-weight: 500;
+	color: #fff;
+	width: 80%;
+	  margin-left: 10%;
+}
+
+.titulo3 a {
+    font-family: Open Sans;
+   line-height: 24px;
+    font-size: 20px;
+    font-weight: 500;
+	color: #efa355;
+	width: 80%;
+}
+
+
+.titulo4 {
+    font-family: Open Sans;
+   line-height: 20px;
+    font-size: 52px;
+    font-weight: 500;
+	color: #efa355;
+	width: 80%;
+	  margin-left: 10%;
+      padding-top: 20px;
+}
+
+.titulo5 {
+    font-family: Open Sans;
+    line-height: 24px;
+    font-size: 20px;
+    font-weight: 500;
+	color: #efa355;
+    margin: 20px;
+    padding-left:20px;
+    padding-right:20px;
+}
+
+
+.titulo3blanco {
+    font-family: Open Sans;
+   line-height: 20px;
+    font-size: 20px;
+    font-weight: 500;
+	color: #fff;
+	 margin: auto;
+	 display: flex;
+   margin-left: 10%;
+}
+.containerbienvenida {
+    display: flex;
+    justify-content: center;
+}
+
+.containerbienvenida p {
+    font-family: 'Open Sans', sans-serif;
+    text-align: justify;
+    font-size: 16px;
+    line-height: 24px;
+    width: 80%;
+    color: #fff;
+    margin: auto;
+}
+
+h1 {
+  font-family: 'Open Sans', sans-serif;
+  padding-top: 100px;
+  font-size: 30px;
+  color: #fff;
+  text-align: center;
+
+}
+  
+
+h2 {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 32px;
+    color: #fff;
+    text-align: center;
+
+}
+  
+
+h3 {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 28px;
+      color: #fff;
+      text-align: center;
+}
+
+h4 {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.element {
+        color: white;
+        padding: 1rem;
+        height: 4rem;
+}
+    
+.columnas {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/*Bordes blancos*/
+.card, #page-enrol-users #filterform, .que .history, .userprofile .profile_tree section, .groupinfobox, .well {
+    border: none;
+}
+
+.course-content li.section li.activity ul {
+    color:#fff;
+    font-family: 'Open Sans', sans-serif;
+    text-align: justify;
+    font-size: 16px;
+    line-height: 30px;
+    color: #fff;
+	margin-left: 20px;
+	padding-bottom: 20px;	
+}
+
+.contenedor {
+    background-image: url('https://campus.citep.rec.uba.ar/pluginfile.php/301117/mod_folder/content/0/debate-ia/images/nodos_home.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 250px 250px 250px;
+    grid-template-areas: 
+    "uno dos tres"
+    "cuatro cinco seis"
+    "siete ocho nueve";
+    place-content: center;
+    gap: 5px;
+    margin-bottom: 20px;
+    height: fit-content;
+}
+
+
+.contenedor2 {
+    background-image: url('https://campus.citep.rec.uba.ar/pluginfile.php/301117/mod_folder/content/0/debate-ia/images/nodos_tema.png');
+    background-repeat: no-repeat;
+    background-position-x: center;
+    display: grid;
+    grid-template-columns: 150px 150px 150px 150px;
+    grid-template-rows: 90px 90px 90px 90px;
+    grid-template-areas:
+        "uno uno tres cuatro"
+        "cinco seis seis ocho"
+        "nueve nueve once once";
+    place-content: center;
+    gap: 5px;
+    height: 700px;
+    margin-top: 0px;
+}
+
+.contenedor3 {
+    background-image: url('https://campus.citep.rec.uba.ar/pluginfile.php/301117/mod_folder/content/0/debate-ia/images/nodos_tema.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    display: grid;
+    grid-template-columns: 200px 200px 200px 200px;
+    grid-template-rows: 200px 200px 200px 200px;
+    grid-template-areas: 
+    "uno uno tres cuatro"
+    "cinco seis seis ocho"
+    "nueve nueve once once";
+    place-content: center;
+    gap: 5px;
+    height: 90%;
+    margin-top: 200px;
+}
+
+.itemmenu {
+    font-size: 18px;
+    color: beige;
+    justify-items: end;
+    align-items: end;
+    border-radius: 12px;
+}
+.item-1 {
+    grid-area: uno;
+    border-radius: 12px;
+}
+.item-2 {
+    grid-area: dos;
+    border-radius: 12px;
+}
+.item-3 {
+    grid-area: tres;
+    border-radius: 12px;
+}
+.item-4 {
+    grid-area: cuatro;
+    border-radius: 12px;
+}
+.item-5 {
+    grid-area: cinco;
+    border-radius: 12px;
+}
+.item-6 {
+    grid-area: seis;
+    border-radius: 12px;
+}
+.item-7 {
+    grid-area: siete;
+    padding-top: 100px;
+    border-radius: 12px;
+}
+.item-8 {
+    grid-area:ocho;
+    border-radius: 12px;
+}
+.item-9 {
+    grid-area: nueve;
+    border-radius: 12px;
+}
+
+.item-10 {
+    grid-area: diez;
+    border-radius: 12px;
+}
+.item-11 {
+    grid-area:once;
+    border-radius: 12px;
+}
+.item-12 {
+    grid-area: doce;
+    border-radius: 12px;
+}
+
+.item-full-1 {
+    grid-area: uno;
+    border-radius: 12px;
+}
+.item-full-2 {
+    grid-area: dos;
+    border-radius: 12px;
+}
+.item-full-3 {
+    grid-area: tres;
+    border-radius: 12px;
+}
+.item-full-4 {
+    grid-area: cuatro;
+    border-radius: 12px;
+}
+.item-full-5 {
+    grid-area: cinco;
+    border-radius: 12px;
+}
+.item-full-6 {
+    grid-area: seis;
+    border-radius: 12px;
+}
+.item-full-7 {
+    grid-area: siete;
+    border-radius: 12px;
+}
+.item-full-8 {
+    grid-area:ocho;
+    border-radius: 12px;
+    padding-top: 50px;
+}
+.item-full-9 {
+    grid-area: nueve;
+    border-radius: 12px;
+}
+.item-full-10 {
+    grid-area: diez;
+    border-radius: 12px;
+}
+.item-full-11 {
+    grid-area:once;
+    padding-top: 50px;
+    border-radius: 12px;
+}
+.item-full-12 {
+    grid-area: doce;
+    border-radius: 12px;
+}
+
+@media screen and (max-width: 600px) {
+    .contenedor2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr;
+      grid-template-areas: 
+      "uno"
+      "seis"
+      "ocho"
+      "nueve"
+      "once";
+      place-content: center;
+      gap: 5px;
+      height: 90%;
+      margin-top: 200px;
+    }
+    .item-8 {
+      padding-top: 1px;
+    }
+    .item-11 {
+      padding-top: 1px;
+    }
+
+    .contenedor {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: 
+        "uno"
+        "cinco"
+        "nueve"
+        "siete";
+        place-content: center;
+        gap: 5px;
+      }
+
+      .contenedor3 {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: 
+        "uno"
+        "seis"
+        "ocho"
+        "nueve"
+        "once";
+        place-content: center;
+        gap: 5px;
+        height: 90%;
+        margin-top: 200px;
+      }
+
+      .item-8 {
+        padding-top: 1px;
+      }
+      .item-11 {
+        padding-top: 1px;
+      }
+      .item-7 {
+        padding-top: 1px;
+      }
+}
+
+.linea {
+  border-top: 1px solid #efa355;
+  height: 2px;
+  max-width: 90%;
+  padding: 0;
+  margin: 20px auto 0 auto;
+}

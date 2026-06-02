@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  /* header con posición relativa, medidas fijas y fondo de color */
+  .header {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    background-color: #fff;
+  }
+
+.card.card-block, #page-enrol-users #filterform.card-block, #page-enrol-users #page-enrol-users #filterform, .que .history.card-block, .que #page-enrol-users #filterform.history, #page-enrol-users .que #filterform.history, .userprofile .profile_tree section.card-block, .userprofile .profile_tree #page-enrol-users section#filterform, #page-enrol-users .userprofile .profile_tree section#filterform, .groupinfobox.card-block, #page-enrol-users #filterform.groupinfobox, .well.card-block, #page-enrol-users #filterform.well, #page-enrol-users #filterform.card, #page-enrol-users .que .history#filterform, .que #page-enrol-users .history#filterform, #page-enrol-users .groupinfobox#filterform, #page-enrol-users .well#filterform, .card .card-block, #page-enrol-users #filterform .card-block, #page-enrol-users #filterform #page-enrol-users #filterform, #page-enrol-users #page-enrol-users #filterform #filterform, .que .history .card-block, .que .history #page-enrol-users #filterform, #page-enrol-users .que .history #filterform, .userprofile .profile_tree section .card-block, .userprofile .profile_tree section #page-enrol-users #filterform, #page-enrol-users .userprofile .profile_tree section #filterform, .groupinfobox .card-block, .groupinfobox #page-enrol-users #filterform, #page-enrol-users .groupinfobox #filterform, .well .card-block, .well #page-enrol-users #filterform, #page-enrol-users .well #filterform, .card #page-enrol-users #filterform, #page-enrol-users .card #filterform, .card .card-body, #page-enrol-users #filterform .card-body, #page-enrol-users #filterform .userprofile .profile_tree section, .userprofile .profile_tree #page-enrol-users #filterform section, .que .history .card-body, .que .history .userprofile .profile_tree section, .userprofile .profile_tree .que .history section, .userprofile .profile_tree section .card-body, .userprofile .profile_tree section .userprofile .profile_tree section, .userprofile .profile_tree .userprofile .profile_tree section section, .groupinfobox .card-body, .groupinfobox .userprofile .profile_tree section, .userprofile .profile_tree .groupinfobox section, .well .card-body, .well .userprofile .profile_tree section, .userprofile .profile_tree .well section, .card .userprofile .profile_tree section, .userprofile .profile_tree .card section {
+    background-color:#fff;
+}
+
+#page-course-view-topics .course-content .single-section .sectionname, #page-course-view-topics .course-content .section .sectionname {
+    background: #fff;
+    border-color:#fff;
+    color: #000000;
+}
+
+#page-wrapper::after {
+    display: none;
+}
+
+
+.txtbienvenida {
+    font-family: monospace;
+    font-size: 1.4rem;
+    padding: 20px;
+    text-align:center;
+    line-height:30px;
+    border: #000000;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    background-color: #fff;
+    color: #000000;
+}

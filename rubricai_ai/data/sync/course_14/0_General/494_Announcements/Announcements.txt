@@ -1,0 +1,5 @@
+Actividad: Announcements
+Tipo: forum
+
+Descripción del foro:
+General news and announcements

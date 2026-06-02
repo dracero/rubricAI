@@ -1,0 +1,4 @@
+Actividad: Área de texto y medios
+Tipo: label
+
+Contenido de la etiqueta:

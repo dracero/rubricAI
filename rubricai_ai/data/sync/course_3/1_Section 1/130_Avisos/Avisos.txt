@@ -1,0 +1,5 @@
+Actividad: Avisos
+Tipo: forum
+
+Descripción del foro:
+Avisos y novedades generales

@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  /* header con posición relativa, medidas fijas y fondo de color */
+  .header {
+      position: relative;
+      width: 100%;
+      height: 40vh;
+      background-color: #eeede9;
+  }
+
+.card.card-block, #page-enrol-users #filterform.card-block, #page-enrol-users #page-enrol-users #filterform, .que .history.card-block, .que #page-enrol-users #filterform.history, #page-enrol-users .que #filterform.history, .userprofile .profile_tree section.card-block, .userprofile .profile_tree #page-enrol-users section#filterform, #page-enrol-users .userprofile .profile_tree section#filterform, .groupinfobox.card-block, #page-enrol-users #filterform.groupinfobox, .well.card-block, #page-enrol-users #filterform.well, #page-enrol-users #filterform.card, #page-enrol-users .que .history#filterform, .que #page-enrol-users .history#filterform, #page-enrol-users .groupinfobox#filterform, #page-enrol-users .well#filterform, .card .card-block, #page-enrol-users #filterform .card-block, #page-enrol-users #filterform #page-enrol-users #filterform, #page-enrol-users #page-enrol-users #filterform #filterform, .que .history .card-block, .que .history #page-enrol-users #filterform, #page-enrol-users .que .history #filterform, .userprofile .profile_tree section .card-block, .userprofile .profile_tree section #page-enrol-users #filterform, #page-enrol-users .userprofile .profile_tree section #filterform, .groupinfobox .card-block, .groupinfobox #page-enrol-users #filterform, #page-enrol-users .groupinfobox #filterform, .well .card-block, .well #page-enrol-users #filterform, #page-enrol-users .well #filterform, .card #page-enrol-users #filterform, #page-enrol-users .card #filterform, .card .card-body, #page-enrol-users #filterform .card-body, #page-enrol-users #filterform .userprofile .profile_tree section, .userprofile .profile_tree #page-enrol-users #filterform section, .que .history .card-body, .que .history .userprofile .profile_tree section, .userprofile .profile_tree .que .history section, .userprofile .profile_tree section .card-body, .userprofile .profile_tree section .userprofile .profile_tree section, .userprofile .profile_tree .userprofile .profile_tree section section, .groupinfobox .card-body, .groupinfobox .userprofile .profile_tree section, .userprofile .profile_tree .groupinfobox section, .well .card-body, .well .userprofile .profile_tree section, .userprofile .profile_tree .well section, .card .userprofile .profile_tree section, .userprofile .profile_tree .card section {
+    background-color:#eeede9;
+}
+
+#page-course-view-topics .course-content .single-section .sectionname, #page-course-view-topics .course-content .section .sectionname {
+  background: #eeede9;
+  border-color:#eeede9;
+  color: #fff;
+  border-style: solid;
+  border-width: 5px 5px 5px 0;
+}
+
+#page-wrapper::after {
+  display: none;
+}
+
+
+#page.container-fluid {
+    background-color: #eeede9;
+}
+
+.flex-menu-bio {
+  display: flex;
+  background-color:#eeede9;
+justify-content:center;
+  flex-wrap: wrap;
+margin: auto;
+width: 90%;
+padding: 10px;
+}
+.flex-menu-bio > div {
+margin-right: 15px;
+}
+
+
+  /* Información con posición absoluta */
+  .header__introduction {
+    position: absolute;
+    /* Todos los límites en cero para ocupar todo el espacio disponible */
+    top: 0;
+    bottom: 0;
+    width: 90%;
+    left: 0;
+    right: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+  }
+  /* Esto no parece ser necesario, se adapta al espacio disponible */
+  .background {
+    background-color:#eeede9;
+    display: block;
+    height: 70%;
+  }
+  
+  p {
+  font-family: 'Open Sans', sans-serif;
+  text-align: justify;
+  font-size: 16px;
+  line-height: 24px;
+  color: #615f5f;
+  padding: 10px;
+  
+  }
+  
+  span {
+    display: table-cell;
+    vertical-align: middle;
+  
+  }
+  #page-navbar {
+   
+   
+    background-color: #eeede9;
+   
+  }
+  #page-navbar .breadcrumb li>* {
+    position: relative;
+    padding: 0.4em 0.8em 0.4em 1.5em;
+    color: #615f5f;
+    background-color:#eeede9;
+  }
+  /* .flex-wrap {
+    flex-wrap: wrap!important;
+    background-color: #212529;
+  }*/
+  
+  h1 {
+  font-family: 'Open Sans', sans-serif;
+  padding-top: 100px;
+  font-size: 30px;
+  color: #fff;
+  text-align: center;
+  }
+  
+  h2 {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 32px;
+    color: #fff;
+    text-align: center;
+    }
+  
+  h3 {
+      font-family: 'Open Sans', sans-serif;
+      font-weight: 400;
+      font-size: 28px;
+      color: #fff;
+      text-align: center;
+      }
+
+      .element {
+        color: white;
+        padding: 1rem;
+        height: 4rem;
+    }
+    
+    .columnas {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }

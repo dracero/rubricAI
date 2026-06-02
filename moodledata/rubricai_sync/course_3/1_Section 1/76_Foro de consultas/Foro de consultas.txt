@@ -1,0 +1,4 @@
+Actividad: Foro de consultas
+Tipo: forum
+
+Descripción del foro:

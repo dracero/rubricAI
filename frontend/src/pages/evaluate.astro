@@ -1,0 +1,432 @@
+---
+import '../styles/global.css';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>RubricAI — Auditoría de Curso</title>
+    <!-- Include Cytoscape.js from CDN for premium ontology visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.29.2/cytoscape.min.js" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="logo">
+        <span>🔍</span> RubricAI
+      </a>
+      <nav>
+        <a href="/">Rúbricas</a>
+        <a href="#" class="active">Auditoría</a>
+        <a href="http://localhost:8080" target="_blank">Volver a Moodle 🎓</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Course Title and Description -->
+      <div class="glass-panel" style="margin-bottom: 30px; border-left: 4px solid var(--primary);">
+        <span style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:1px;">Curso a Evaluar</span>
+        <h1 id="course-title" style="font-size:28px; margin-top:5px; margin-bottom:10px;">Cargando detalles del curso...</h1>
+        <p id="course-summary" style="font-size:14px; color:var(--text-secondary);"></p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: start;">
+        
+        <!-- Left Column: Controls and Ontology Graph -->
+        <div style="display:flex; flex-direction:column; gap:30px;">
+          
+          <!-- Control Panel -->
+          <div class="glass-panel">
+            <h3 style="font-size:18px; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+              <span>🚀</span> Control de Auditoría
+            </h3>
+            
+            <div style="margin-bottom: 20px;">
+              <label for="rubric-select">Selecciona la Rúbrica de Referencia:</label>
+              <select id="rubric-select" style="margin-bottom:10px;">
+                <option value="">Cargando rúbricas...</option>
+              </select>
+            </div>
+            
+            <button id="btn-run-evaluate" class="btn btn-primary" style="width:100%; padding:14px; font-size:15px;">
+              ⚡ Iniciar Comparación Multi-Agente
+            </button>
+            <div id="evaluate-loader" style="margin-top: 15px; text-align:center; display:none;">
+              <div class="alert alert-info">
+                🤖 Los agentes (Holístico, Formato y Ontología) están analizando el curso. Esto puede tardar unos segundos...
+              </div>
+            </div>
+          </div>
+
+          <!-- Ontology Visualization Panel -->
+          <div class="glass-panel">
+            <h3 style="font-size:16px; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+              <span>🕸️</span> Grafo de Ontología Pedagógica (Neo4j)
+            </h3>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:15px;">
+              Esquema de relaciones semánticas entre rúbricas, criterios de evaluación, dimensiones pedagógicas y taxonomía de Bloom almacenados en la base de datos de grafos.
+            </p>
+            
+            <!-- Graph container -->
+            <div id="cy"></div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Audit Results -->
+        <div style="display:flex; flex-direction:column; gap:30px;">
+          
+          <!-- Placeholder state -->
+          <div id="results-placeholder" class="glass-panel" style="text-align:center; padding: 60px 20px;">
+            <span style="font-size: 48px;">🤖</span>
+            <h2 style="margin-top: 20px; font-size: 20px; margin-bottom: 10px;">Espera de Auditoría</h2>
+            <p style="color:var(--text-secondary); font-size:14px; max-width:400px; margin: 0 auto;">
+              Selecciona una rúbrica en la columna de la izquierda y haz clic en "Iniciar Comparación" para auditar el curso de Moodle de forma pedagógica y de formato.
+            </p>
+          </div>
+
+          <!-- Results Dashboard -->
+          <div id="results-dashboard" style="display: none; flex-direction: column; gap: 30px;">
+            
+            <!-- Score & Summaries -->
+            <div style="display:grid; grid-template-columns: 1fr 2fr; gap:20px;">
+              
+              <!-- Score Display Card -->
+              <div class="glass-panel" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+                <span style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-secondary); margin-bottom:10px;">Puntaje de Alineación</span>
+                <div id="results-score" style="font-size: 56px; font-weight: 800; text-shadow: 0 0 15px rgba(99, 102, 241, 0.3);">90.0%</div>
+                <div id="results-rubric-tag" style="margin-top:10px; font-size:11px; color:var(--text-secondary); background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:100px;"></div>
+              </div>
+
+              <!-- Report Summaries Card -->
+              <div class="glass-panel" style="display:flex; flex-direction:column; gap:15px;">
+                <h3 style="font-size:16px; color:#fff; display:flex; align-items:center; gap:6px;">
+                  <span>📋</span> Resumen de Diagnósticos
+                </h3>
+                <div style="font-size:13px; line-height:1.4;">
+                  <strong style="color:var(--accent-orange)">Análisis Holístico:</strong>
+                  <p id="results-holistic" style="color:var(--text-secondary); margin-top:4px; margin-bottom:12px;"></p>
+                  
+                  <strong style="color:var(--primary)">Análisis de Formato:</strong>
+                  <p id="results-format" style="color:var(--text-secondary); margin-top:4px;"></p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Action Plan Cards -->
+            <div class="glass-panel">
+              <h3 style="font-size:18px; margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+                <span>🛠️</span> Plan de Acción Accionable (Qué cambiar en Moodle)
+              </h3>
+              
+              <div id="recommendations-container" style="display:grid; grid-template-columns: 1fr; gap:15px;">
+                <!-- Recommendations will be injected here -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+    <script is:inline>
+      const PYTHON_API = 'http://localhost:8000';
+      const MOODLE_API = 'http://localhost:8080';
+      
+      // Parse query params
+      const urlParams = new URLSearchParams(window.location.search);
+      const courseId = parseInt(urlParams.get('course_id')) || 8; // fallback to 8
+      const courseNameParam = urlParams.get('course_name') || 'Curso de Moodle';
+
+      let courseData = null;
+
+      // 1. Fetch Course Data from Moodle AJAX endpoint
+      async function loadCourseData() {
+        const titleEl = document.getElementById('course-title');
+        const descEl = document.getElementById('course-summary');
+        
+        try {
+          titleEl.textContent = `Cargando metadata del curso ${courseId}...`;
+          const res = await fetch(`${MOODLE_API}/local/rubricai/ajax_course_data.php?course_id=${courseId}`);
+          courseData = await res.json();
+          
+          if (courseData && courseData.fullname) {
+            titleEl.textContent = courseData.fullname;
+            descEl.textContent = courseData.summary || 'Sin descripción del curso.';
+          } else {
+            titleEl.textContent = courseNameParam;
+            descEl.textContent = `No se pudieron cargar datos detallados de Moodle. Payload simulado disponible.`;
+            // Fallback mock course data for frontend development
+            courseData = {
+              "id": courseId,
+              "fullname": courseNameParam,
+              "shortname": "MOCK",
+              "summary": "Curso simulado de prueba",
+              "sections": [
+                {
+                  "num": 0,
+                  "name": "General",
+                  "summary": "",
+                  "activities": [
+                    { "id": 1, "name": "Plan de Estudio", "type": "resource", "description": "PDF con el silabo del curso" }
+                  ]
+                },
+                {
+                  "num": 1,
+                  "name": "Semana 1",
+                  "summary": "Introducción",
+                  "activities": [
+                    { "id": 2, "name": "Foro de Bienvenida", "type": "forum", "description": "Preséntate con tus compañeros", "settings": { "type": "general", "assessed": 0 } },
+                    { "id": 3, "name": "Tarea 1", "type": "assign", "description": "", "settings": { "duedate": 0, "grade": 100 } } // Empty description & empty duedate
+                  ]
+                }
+              ]
+            };
+          }
+        } catch (e) {
+          console.error(e);
+          titleEl.textContent = courseNameParam;
+          descEl.textContent = `Error al conectar con Moodle: ${e.message}. Corriendo en modo desconectado con datos locales de prueba.`;
+        }
+      }
+
+      // 2. Load Rubrics from FastAPI for select control
+      async function loadRubricsSelector() {
+        const select = document.getElementById('rubric-select');
+        try {
+          const res = await fetch(`${PYTHON_API}/rubrics`);
+          const data = await res.json();
+          
+          if (data && data.length > 0) {
+            select.innerHTML = '';
+            data.forEach(rub => {
+              const opt = document.createElement('option');
+              opt.value = rub.id;
+              opt.textContent = rub.title;
+              select.appendChild(opt);
+            });
+          } else {
+            select.innerHTML = '<option value="">No hay rúbricas registradas en Neo4j</option>';
+          }
+        } catch (e) {
+          select.innerHTML = '<option value="">Error al conectar con Python API</option>';
+        }
+      }
+
+      // 3. Draw Ontology Graph with Cytoscape.js
+      async function drawOntologyGraph() {
+        try {
+          const res = await fetch(`${PYTHON_API}/ontology`);
+          const data = await res.json();
+          
+          if (!data || !data.nodes) return;
+          
+          const cyNodes = data.nodes.map(n => ({
+            data: { id: n.id, label: n.label, type: n.type }
+          }));
+          
+          const cyEdges = data.edges.map((e, idx) => ({
+            data: { id: `e_${idx}`, source: e.source, target: e.target, label: e.relation }
+          }));
+
+          const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: [...cyNodes, ...cyEdges],
+            style: [
+              {
+                selector: 'node',
+                style: {
+                  'label': 'data(label)',
+                  'color': '#fff',
+                  'font-size': '11px',
+                  'text-valign': 'center',
+                  'text-halign': 'center',
+                  'background-color': '#444',
+                  'width': '60px',
+                  'height': '60px',
+                  'overlay-opacity': 0,
+                  'border-width': '2px',
+                  'border-color': '#666'
+                }
+              },
+              {
+                selector: 'node[type="rubric"]',
+                style: {
+                  'background-color': '#ff5e3a',
+                  'border-color': '#ff2a6d',
+                  'width': '75px',
+                  'height': '75px'
+                }
+              },
+              {
+                selector: 'node[type="criterion"]',
+                style: {
+                  'background-color': '#ff2a6d',
+                  'border-color': '#ff007f',
+                  'width': '55px',
+                  'height': '55px'
+                }
+              },
+              {
+                selector: 'node[type="dimension"]',
+                style: {
+                  'background-color': '#6366f1',
+                  'border-color': '#4f46e5',
+                  'width': '65px',
+                  'height': '65px'
+                }
+              },
+              {
+                selector: 'node[type="bloom"]',
+                style: {
+                  'background-color': '#10b981',
+                  'border-color': '#059669',
+                  'width': '55px',
+                  'height': '55px'
+                }
+              },
+              {
+                selector: 'edge',
+                style: {
+                  'width': 2,
+                  'line-color': '#334155',
+                  'target-arrow-color': '#334155',
+                  'target-arrow-shape': 'triangle',
+                  'curve-style': 'bezier',
+                  'font-size': '8px',
+                  'color': '#94a3b8',
+                  'text-background-opacity': 0.7,
+                  'text-background-color': '#0d0d12',
+                  'label': 'data(label)'
+                }
+              }
+            ],
+            layout: {
+              name: 'cose',
+              animate: true,
+              refresh: 20,
+              fit: true,
+              padding: 30,
+              nodeRepulsion: function( node ){ return 8000; }
+            }
+          });
+        } catch (e) {
+          console.error("Error drawing graph:", e);
+        }
+      }
+
+      // 4. Trigger Evaluate comparison
+      document.getElementById('btn-run-evaluate').addEventListener('click', async () => {
+        const rubricSelect = document.getElementById('rubric-select');
+        const rubricId = rubricSelect.value;
+        
+        if (!rubricId) {
+          alert('Por favor selecciona una rúbrica.');
+          return;
+        }
+
+        const loader = document.getElementById('evaluate-loader');
+        const placeholder = document.getElementById('results-placeholder');
+        const dashboard = document.getElementById('results-dashboard');
+        
+        loader.style.display = 'block';
+        placeholder.style.display = 'none';
+        dashboard.style.display = 'none';
+
+        try {
+          const body = {
+            course_id: courseId,
+            rubric_id: rubricId,
+            course_data: courseData
+          };
+
+          const res = await fetch(`${PYTHON_API}/evaluate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const result = await res.json();
+          
+          loader.style.display = 'none';
+          
+          if (result && result.overall_score !== undefined) {
+            // Render results
+            const scoreEl = document.getElementById('results-score');
+            const rubricTag = document.getElementById('results-rubric-tag');
+            const holisticEl = document.getElementById('results-holistic');
+            const formatEl = document.getElementById('results-format');
+            const container = document.getElementById('recommendations-container');
+            
+            scoreEl.textContent = `${result.overall_score.toFixed(1)}%`;
+            
+            // Set color based on score
+            if (result.overall_score >= 80) scoreEl.style.color = 'var(--accent-green)';
+            else if (result.overall_score >= 50) scoreEl.style.color = 'var(--accent-yellow)';
+            else scoreEl.style.color = 'var(--accent-pink)';
+
+            rubricTag.textContent = `Rúbrica: ${rubricId}`;
+            holisticEl.innerHTML = result.holistic_evaluation.replace(/\n/g, '<br>');
+            formatEl.innerHTML = result.format_evaluation.replace(/\n/g, '<br>');
+            
+            container.innerHTML = '';
+            
+            if (result.recommendations && result.recommendations.length > 0) {
+              result.recommendations.forEach(rec => {
+                const card = document.createElement('div');
+                card.style.padding = '15px';
+                card.style.background = 'rgba(255,255,255,0.01)';
+                card.style.border = '1px solid rgba(255,255,255,0.04)';
+                card.style.borderRadius = '10px';
+                card.style.borderLeft = rec.type === 'format' ? '4px solid var(--primary)' : '4px solid var(--accent-orange)';
+                
+                const badge = rec.type === 'format' ? 
+                  `<span style="font-size:9px; background:rgba(99,102,241,0.15); color:#a5b4fc; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase;">Formato</span>` :
+                  `<span style="font-size:9px; background:rgba(255,94,58,0.15); color:#ff9d85; padding:2px 6px; border-radius:4px; font-weight:700; text-transform:uppercase;">Pedagógico</span>`;
+                
+                card.innerHTML = `
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="font-size:14px; color:#fff;">${rec.element}</strong>
+                    ${badge}
+                  </div>
+                  <div style="font-size:13px; color:var(--text-secondary); margin-bottom:10px;">
+                    <strong>Problema:</strong> ${rec.issue}
+                  </div>
+                  <div style="font-size:13px; padding:10px; background:rgba(245,158,11,0.02); border-left:2px solid var(--accent-orange); color:#fff; border-radius:0 4px 4px 0; line-height:1.4;">
+                    <strong style="color:var(--accent-orange); font-size:11px; text-transform:uppercase; display:block; margin-bottom:4px;">Cambio Sugerido en Moodle:</strong>
+                    ${rec.change}
+                  </div>
+                `;
+                container.appendChild(card);
+              });
+            } else {
+              container.innerHTML = '<div class="alert alert-info">¡Felicidades! No se detectaron recomendaciones para corregir. El curso cumple al 100% con la rúbrica.</div>';
+            }
+            
+            dashboard.style.display = 'flex';
+            drawOntologyGraph(); // refresh graph to show new relationships
+          } else {
+            alert('Error en la evaluación: ' + (result.message || 'Respuesta inválida.'));
+            placeholder.style.display = 'block';
+          }
+        } catch (e) {
+          console.error(e);
+          loader.style.display = 'none';
+          placeholder.style.display = 'block';
+          alert('Error de conexión con la API de Python: ' + e.message);
+        }
+      });
+
+      // Initialize
+      async function init() {
+        await loadCourseData();
+        await loadRubricsSelector();
+        await drawOntologyGraph();
+      }
+
+      init();
+    </script>
+  </body>
+</html>

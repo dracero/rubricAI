@@ -1,0 +1,215 @@
+---
+import '../styles/global.css';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>RubricAI — Gestión de Rúbricas</title>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="logo">
+        <span>🔍</span> RubricAI
+      </a>
+      <nav>
+        <a href="/" class="active">Rúbricas</a>
+        <a href="http://localhost:8080" target="_blank">Volver a Moodle 🎓</a>
+      </nav>
+    </header>
+
+    <main>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start;">
+        
+        <!-- Left Column: List of Rubrics -->
+        <div class="glass-panel">
+          <h2 style="margin-bottom: 20px; font-size: 20px; display:flex; align-items:center; gap:8px;">
+            <span>📋</span> Rúbricas en Neo4j
+          </h2>
+          
+          <div id="rubrics-list" style="display: flex; flex-direction: column; gap: 15px;">
+            <p style="color: var(--text-secondary); font-size: 14px;">Cargando rúbricas de la base de datos de grafos...</p>
+          </div>
+
+          <div id="rubric-detail-box" style="margin-top: 30px; display: none; padding-top: 20px; border-top: 1px solid var(--panel-border);">
+            <h3 id="detail-title" style="color: var(--accent-orange); font-size: 18px; margin-bottom: 10px;"></h3>
+            <p id="detail-desc" style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;"></p>
+            
+            <div id="detail-criteria" style="display:flex; flex-direction:column; gap:15px;"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: Upload / Create Rubric -->
+        <div class="glass-panel">
+          <h2 style="margin-bottom: 20px; font-size: 20px; display:flex; align-items:center; gap:8px;">
+            <span>⚡</span> Cargar Rúbrica
+          </h2>
+
+          <!-- Upload JSON Box -->
+          <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--panel-border); margin-bottom: 30px;">
+            <h3 style="font-size: 14px; color: var(--text-primary); margin-bottom: 10px; display:flex; align-items:center; gap:6px;">
+              <span>📁</span> Importar desde archivo JSON
+            </h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 15px;">
+              Sube una rúbrica en formato estructurado JSON para guardarla directamente como un subgrafo en Neo4j.
+            </p>
+            
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="file" id="json-file-input" accept=".json" style="flex:1;" />
+              <button id="btn-upload-file" class="btn btn-primary">Cargar</button>
+            </div>
+            <div id="upload-status" style="margin-top: 10px; font-size: 12px;"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+    <script is:inline>
+      const API_URL = 'http://localhost:8000';
+
+      // Load rubrics from FastAPI
+      async function loadRubrics() {
+        const listDiv = document.getElementById('rubrics-list');
+        try {
+          const res = await fetch(`${API_URL}/rubrics`);
+          const data = await res.json();
+          
+          if (data && data.length > 0) {
+            listDiv.innerHTML = '';
+            data.forEach(rub => {
+              const card = document.createElement('div');
+              card.style.padding = '15px';
+              card.style.background = 'rgba(255,255,255,0.02)';
+              card.style.border = '1px solid rgba(255,255,255,0.06)';
+              card.style.borderRadius = '10px';
+              card.style.cursor = 'pointer';
+              card.style.transition = 'all 0.2s';
+              
+              card.innerHTML = `
+                <div style="font-weight: 700; color: var(--accent-orange); font-size:15px; margin-bottom: 5px;">${rub.title}</div>
+                <div style="font-size:12px; color: var(--text-secondary); margin-bottom: 8px;">ID: <code>${rub.id}</code></div>
+                <div style="font-size:13px; color: #ccc;">${rub.description || 'Sin descripción.'}</div>
+              `;
+              
+              card.addEventListener('mouseenter', () => {
+                card.style.background = 'rgba(255,255,255,0.05)';
+                card.style.borderColor = 'rgba(255,255,255,0.12)';
+              });
+              card.addEventListener('mouseleave', () => {
+                card.style.background = 'rgba(255,255,255,0.02)';
+                card.style.borderColor = 'rgba(255,255,255,0.06)';
+              });
+              card.addEventListener('click', () => showRubricDetails(rub.id));
+              listDiv.appendChild(card);
+            });
+          } else {
+            listDiv.innerHTML = '<p style="color:var(--text-secondary); font-size:13px;">No hay rúbricas registradas en Neo4j. ¡Carga una a la derecha!</p>';
+          }
+        } catch (e) {
+          console.error(e);
+          listDiv.innerHTML = '<p style="color:#f87171; font-size:13px;">Error al conectar con la API de Python.</p>';
+        }
+      }
+
+      // Show rubric detail view
+      async function showRubricDetails(id) {
+        const box = document.getElementById('rubric-detail-box');
+        const titleEl = document.getElementById('detail-title');
+        const descEl = document.getElementById('detail-desc');
+        const criteriaEl = document.getElementById('detail-criteria');
+        
+        try {
+          const res = await fetch(`${API_URL}/rubrics/${id}`);
+          const rub = await res.json();
+          
+          if (rub && rub.title) {
+            titleEl.textContent = rub.title;
+            descEl.textContent = rub.description || '';
+            criteriaEl.innerHTML = '';
+            
+            rub.criteria.forEach(crit => {
+              const cDiv = document.createElement('div');
+              cDiv.style.background = 'rgba(255,255,255,0.01)';
+              cDiv.style.border = '1px solid rgba(255,255,255,0.04)';
+              cDiv.style.borderRadius = '8px';
+              cDiv.style.padding = '12px';
+              
+              let levelsHtml = '';
+              crit.levels.forEach(lvl => {
+                levelsHtml += `
+                  <div style="font-size:11px; margin-top:6px; padding: 4px 8px; background:rgba(0,0,0,0.2); border-radius:4px;">
+                    <strong style="color:var(--primary);">${lvl.label} (${lvl.score} pts):</strong>
+                    <span style="color:#ccc;">${lvl.description}</span>
+                  </div>
+                `;
+              });
+              
+              cDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                  <strong style="color:#fff; font-size:14px;">${crit.name}</strong>
+                  <span style="font-size:11px; background:rgba(99, 102, 241, 0.2); color:#a5b4fc; padding:2px 6px; border-radius:4px;">${crit.weight}% - ${crit.dimension}</span>
+                </div>
+                <p style="font-size:12px; color:#aaa;">${crit.description}</p>
+                <div style="margin-top:8px;">
+                  ${levelsHtml}
+                </div>
+              `;
+              criteriaEl.appendChild(cDiv);
+            });
+            
+            box.style.display = 'block';
+            box.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // Upload JSON File
+      document.getElementById('btn-upload-file').addEventListener('click', async () => {
+        const fileInput = document.getElementById('json-file-input');
+        const status = document.getElementById('upload-status');
+        
+        if (fileInput.files.length === 0) {
+          status.innerHTML = '<span style="color:#ef4444">Selecciona un archivo JSON primero.</span>';
+          return;
+        }
+        
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        
+        status.innerHTML = '<span style="color:var(--text-secondary)">Leyendo archivo...</span>';
+        
+        reader.onload = async (e) => {
+          try {
+            const rawJSON = JSON.parse(e.target.result);
+            
+            const res = await fetch(`${API_URL}/rubrics`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(rawJSON)
+            });
+            const result = await res.json();
+            
+            if (result.status === 'success') {
+              status.innerHTML = '<span style="color:var(--accent-green)">✔ Archivo importado y guardado en Neo4j.</span>';
+              loadRubrics();
+            } else {
+              status.innerHTML = `<span style="color:#ef4444">❌ Error: ${result.message}</span>`;
+            }
+          } catch (err) {
+            status.innerHTML = `<span style="color:#ef4444">❌ Error parsing JSON: ${err.message}</span>`;
+          }
+        };
+        
+        reader.readAsText(file);
+      });
+
+      // Init load
+      loadRubrics();
+    </script>
+  </body>
+</html>

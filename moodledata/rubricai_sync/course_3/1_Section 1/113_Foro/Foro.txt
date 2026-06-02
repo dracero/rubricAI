@@ -1,0 +1,4 @@
+Actividad: Foro
+Tipo: forum
+
+Descripción del foro:

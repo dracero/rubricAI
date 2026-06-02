@@ -1,0 +1,4 @@
+Actividad: Primera entrada del diario
+Tipo: assign
+
+Instrucciones de la tarea:

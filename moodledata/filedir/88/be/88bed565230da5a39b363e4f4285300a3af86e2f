@@ -1,0 +1,71 @@
+.content {
+background-color: #520d29;
+margin: auto;
+width: 100%;
+padding: 0px;
+}
+
+.c1 {
+}
+.c2 {
+display: flex;
+flex-direction: row;
+margin: 0 auto;
+margin-left: -8px;
+}
+.c2a {
+margin: 0 auto;
+}
+.c3 {
+margin-top: 0px
+}
+.cajatexto {
+    width: 100%;
+    color: #ffffff;
+    font-size: 1.2em;
+    text-decoration: none;
+    text-align: justify; 
+    margin: 15px 15px; 
+}
+
+.textocapitulo {
+    color: #ffffff;
+    font-size: 1.3em;
+    text-decoration: none;
+    text-align: justify; 
+    padding-left: 100px;
+    padding-right: 100px;
+    padding-top: 50px; 
+    }
+
+.textocentradonarrativasdos {
+color: #ffffff;
+font-size: 1.2em;
+text-decoration: none;
+text-align: justify; 
+margin: 100px 100px; 
+}
+.btcapitulos{
+/*box-shadow: 0 8px 6px 0 rgba(0,0,0,0.2), 0 6px 0px 0 rgba(0,0,0,0.9);*/
+margin-left: 30px;
+color:#ffffff;
+width: fit-content;
+float: left;
+}
+    
+.btcapitulos a{
+color:#ffffff;
+text-decoration: none;
+}
+    
+.btcapitulos a:hover{
+color:#dfae73;
+text-decoration: none;
+}
+.btcentrados {
+background-color: #520d29;
+margin: auto;
+width: 100%;
+padding: 0px;
+height: 100%;
+}

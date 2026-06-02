@@ -1,0 +1,957 @@
+/* === PERFILES DE COLOR (variables CSS por tema) === */
+
+.tema-violeta {
+  --color-principal: #654372;
+  --color-hover: #a98cc0;
+  --color-popup: #654372;
+  --color-subtitulo: #654372;
+  --color-boton-texto-hover: #a98cc0;
+  --color-suave: #f2eaf7;
+}
+
+.tema-verde {
+  --color-principal: #40b99d;
+  --color-hover: #a0d6b4;
+  --color-popup: #40b99d;
+  --color-subtitulo: #40b99d;
+  --color-boton-texto-hover: #a0d6b4;
+  --color-suave: #fffbe5;
+  }
+
+.tema-amarillo {
+  --color-principal: #f2ca20;
+  --color-hover: #ffea85;
+  --color-popup: #f2ca20;
+  --color-subtitulo: #f2ca20;
+  --color-boton-texto-hover: #ffea85;
+  --color-suave: #fffbe5;
+}
+
+.tema-celeste {
+  --color-principal: #00a7c1;
+  --color-hover: #99dce6;
+  --color-popup: #00a7c1;
+  --color-subtitulo: #00a7c1;
+  --color-boton-texto-hover: #99dce6;
+  --color-suave: #e2f9fc;
+}
+
+.tema-rosa {
+  --color-principal: #ed556c; 
+  --color-hover: #febad9;
+  --color-popup: #ed556c;
+  --color-subtitulo: #ed5555;
+  --color-boton-texto-hover: #febad9;
+  --color-suave: #fde6ec;
+}
+
+/* === CAMBIO DE IMÁGENES SEGÚN TEMA === */
+
+/* Violeta */
+.tema-violeta .item-menu:hover img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botonvioletahover.png');
+}
+
+.tema-violeta .item-menu.activo img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botonvioletaonclic.png');
+}
+
+/* Rosa */
+.tema-rosa .item-menu:hover img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botonrosahover.png');
+}
+
+.tema-rosa .item-menu.activo img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botonrosaonclic.png');
+}
+
+/* Celeste */
+.tema-celeste .item-menu:hover img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botoncelestehover.png');
+}
+
+.tema-celeste .item-menu.activo img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botoncelesteonclic.png');
+}
+
+/* Amarillo */
+.tema-amarillo .item-menu:hover img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botonamarillohover.png');
+}
+
+.tema-amarillo .item-menu.activo img.icono-menu {
+content: url('https://campus.citep.rec.uba.ar/pluginfile.php/199918/mod_folder/content/0/Botones/botonamarilloonclic.png');
+}
+
+/* === TIPOGRAFÍA GLOBAL === */
+.bloque-interactivo h1,
+.bloque-interactivo h2,
+.bloque-interactivo h3,
+.bloque-interactivo h4,
+.bloque-interactivo h5,
+.bloque-interactivo h6,
+.bloque-interactivo p,
+.bloque-interactivo span,
+.bloque-interactivo a,
+.bloque-interactivo li,
+.bloque-interactivo dt,
+.bloque-interactivo dd,
+.bloque-interactivo blockquote,
+.bloque-interactivo strong,
+.bloque-interactivo em,
+.bloque-interactivo label,
+.bloque-interactivo th,
+.bloque-interactivo table
+.bloque-interactivo td {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* === BLOQUE GENERAL === */
+.bloque-interactivo {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* === ENCABEZADO === */
+.encabezado {
+  background-color: #fff;
+  text-align: center;
+}
+
+.encabezado img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.titulo-con-icono {
+  background-color: var(--color-principal);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+}
+
+.titulo-con-icono h1 {
+  font-size: 1.5em;
+  margin: 0;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* === ENLACE CON ICONO === */
+.icono-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.icono-link svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
+}
+
+/* === PRESENTACIÓN DEL MÓDULO === */
+.presentacion-modulo {
+  background-color: #ffffff;
+  padding: 25px 10px 20px 10px;
+  text-align: left;
+}
+
+.texto-presentacion {
+  max-width: 1100px;
+  margin: 0 auto;
+  color: #333;
+  font-size: 1em;
+  line-height: 1.6;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+}
+
+/* Línea separadora */
+.linea-fina {
+  border: none;
+  height: 1px;
+  background-color: #cccc;
+  margin: 2px auto 20px auto;
+  width: 93%;
+}
+
+/* Tabla tipo definición con línea solo en columna derecha */
+
+.tabla-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.columna-titulo {
+  flex: 1 1 20%;
+  font-weight: 450;
+  font-size: 1.2em;
+  color: #333;
+  min-width: 160px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.columna-contenido {
+  flex: 1 1 75%;
+  font-weight: 300;
+  font-size: 1em;
+  color: #333;
+  border-top: 2px solid var(--color-principal);
+  padding-top: 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.columna-contenido p {
+  margin: 0;
+}
+
+
+/* === CONTENEDORES PRINCIPALES === */
+#menu-container {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+/* === MENÚ LATERAL === */
+#sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: white;
+  padding: 20px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  background-color: transparent;
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.1); /*Ver si queda*/
+  flex-direction: row;
+}
+
+.item-menu img.icono-menu {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  box-shadow: none;
+  transition: none;
+}
+
+.item-menu span {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  color: #333;
+  word-break: break-word;
+  white-space: normal;
+  max-width: 140px;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+
+/* Hover y activo */
+.item-menu:hover {
+  background-color: var(--color-hover);
+}
+
+.item-menu:hover img.icono-menu {
+  content: url('https://campus.citep.rec.uba.ar/repository/coursefilearea/file.php/1/estudiodecasos/hoverlila.png');
+}
+
+.item-menu:hover span {
+  color: white;
+}
+
+.item-menu.activo {
+  background-color: var(--color-principal);
+}
+
+.item-menu.activo img.icono-menu {
+  content: url('https://campus.citep.rec.uba.ar/repository/coursefilearea/file.php/1/estudiodecasos/hoveroscuro.png');
+}
+
+.item-menu.activo span {
+  color: white;
+}
+
+/* === CONTENIDO PRINCIPAL === */
+#contenido-principal {
+  flex-grow: 1;
+  min-width: 0;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.contenido {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+/* === SUBTÍTULOS === */
+.subtitulo {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 17pt;
+  line-height: 42px;
+  color: var(--color-subtitulo);
+  margin-bottom: -2px;
+  background-color: transparent;
+  display: inline-block;
+  border-radius: 0;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  margin-top: -8px;
+}
+
+/* === CUERPO DE TEXTO === */
+.cuerpo-texto {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #333;
+  max-width: 800px;
+}
+
+.cuerpo-texto p {
+  margin-bottom: 1em;
+  text-align: justify;
+}
+
+.dos-columnas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.dos-columnas p {
+  flex: 1 1 45%;
+  min-width: 250px;
+}
+
+/* === PIE DE PÁGINA === */
+footer.pie {
+  background-color: #e3e4e5;
+  text-align: center;
+  padding: 40px 20px 20px;
+  border-top: 1px solid #ccc;
+}
+
+.btn-descarga {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: var(--color-principal);
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* === CENTRADO OPCIONAL PARA BOTONES === */
+.btn-centrado {
+  display: inline-flex;
+  justify-content: center;
+  text-align: center;
+  margin: 20px auto 0;
+  max-width: 100%;
+}
+
+/*hover y activo del botón de descarga*/
+.btn-descarga:hover {
+  color: var(--color-boton-texto-hover);
+}
+
+.btn-descarga:active {
+  background-color: var(--color-principal);
+  color: white;
+  outline: none;
+  box-shadow: none;
+}
+
+.btn-descarga img {
+  width: 24px;
+  height: 24px;
+}
+
+/* === POPUPS === */
+.popup-trigger {
+  cursor: pointer;
+  color: var(--color-popup);
+  font-weight: bold;
+  text-decoration: underline dotted;
+  position: relative;
+}
+
+/*.popup-box {
+  position: absolute;
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1000;
+  font-size: 0.9em;
+  display: none;
+} */
+.popup-box {
+  position: absolute;
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  z-index: 1000;
+  font-size: 0.9em;
+  display: none;
+  white-space: normal;        /* ✅ permite salto de línea */
+  max-width: 320px;           /* ✅ limita el ancho para evitar desbordes */
+  word-wrap: break-word;      /* ✅ fuerza corte si hay palabras largas */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* === BLOQUES DESTACADOS === */
+.fondo-gris {
+  background-color: #cccccc;
+  padding: 30px;
+  border-radius: 1px;
+  margin: 1em 0;
+  font-weight: 300;
+}
+
+.texto-grande {
+  font-size: 1.6em;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #333;
+  text-align: left;
+}
+.fondo-tema {
+  background-color: var(--color-suave);  /* definido por tema */
+  padding: 30px;
+  border-radius:0px;
+  margin: 1em 0;
+}
+
+.cuerpo-texto p.texto-grande {
+  text-align: left;
+}
+/* === DECORATIVOS === */
+.linea-violeta {
+  width: 60px;
+  height: 4px;
+  background-color: var(--color-principal);
+  margin: 1.2em 0;
+  border: none;
+}
+
+.resaltado-tema {
+  color: var(--color-principal);
+  font-weight: 700;
+  text-decoration: none; /* quita la línea subrayada del enlace */
+}
+
+a.resaltado-tema {
+  color: var(--color-principal) !important;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.resaltado-tema:hover {
+  color: var(--color-hover);
+}
+
+.italica {
+  font-style: italic;
+}
+
+.destacado-gris {
+  font-weight: 600;
+  color: #555;
+}
+
+.viñeta-tema {
+  background-color: var(--color-suave);
+  border-radius: 12px;
+  padding: 1.2em 1.5em;
+  position: relative;
+  margin: 1.5em 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1em;
+  line-height: 1.6;
+  color: #333;
+  border-left: 6px solid var(--color-principal);
+}
+
+
+.viñeta-tema::before {
+  content: "";
+  position: absolute;
+  top: 1.2em;
+  left: -12px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 12px solid var(--color-principal);
+}
+
+.dato-curioso {
+  background-color: #ffffff;
+  border-left: 4px solid var(--color-principal);
+  padding: 1em;
+  margin: 1em 0;
+  font-size: 1em;
+  color: #444;
+  display: block;
+  align-items: flex-start;
+  gap: 0.8em;
+  border-radius: 1px;
+}
+
+/* Si usás una imagen opcional como ícono */
+.dato-curioso img.icono-curioso {
+  width: 1.2em;
+  height: 1.2em;
+  vertical-align: middle;
+  margin-right: 0.5em;
+}
+
+.destacado-tema {
+  background-color: var(--color-suave);
+  border-left: 6px solid var(--color-principal);
+  padding: 1em;
+  margin: 1.2em 0;
+  font-size: 1em;
+  color: #333;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  border-radius: 0;
+}
+
+.destacado-tema img.icono-antecedente {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-top: 0.2em;
+}
+
+.recomendacion-docente {
+  background-color: var(--color-suave);
+  border-left: 5px solid var(--color-principal);
+  padding: 1em;
+  margin: 1em 0;
+  font-size: 1em;
+  color: #333;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  border-radius: 10px;
+}
+
+.recomendacion-docente img.icono-recomendacion {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-top: 0.2em;
+}
+
+.ejemplo-clave {
+  background-color: var(--color-suave);
+  border-left: 4px dashed var(--color-principal);
+  padding: 1em;
+  margin: 1em 0;
+  font-size: 0.98em;
+  color: #333;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  border-radius: 10px;
+}
+
+.ejemplo-clave img.icono-ejemplo {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  margin-top: 0.2em;
+}
+
+.cita-reflexiva {
+  font-style: italic;
+  background-color: var(--color-suave);
+  border-left: 4px solid var(--color-principal);
+  padding: 0.8em 1em;
+  margin: 1em 0;
+}
+
+.alerta-suave {
+  background-color: #fff4e5;
+  border-left: 4px solid #ffb84d;
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  font-weight: 500;
+}
+
+.dato-clave {
+  display: inline-block;
+  background-color: var(--color-hover);
+  color: #fff;
+  padding: 0.3em 0.6em;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.bloque-conclusion {
+  background-color: var(--color-suave); /* tema-dependiente */
+  border: 2px solid var(--color-principal);
+  padding: 1.2em 1.5em;
+  margin: 2em 0 1.5em;
+  font-size: 1em;
+  color: #222;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  font-weight: 500;
+}
+.bloque-conclusion-fondo-bco {
+  background-color: #ffffff; /* tema-dependiente */
+  border: 2px solid var(--color-principal);
+  padding: 1.2em 1.5em;
+  margin: 2em 0 1.5em;
+  font-size: 1em;
+  color: #222;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+  font-weight: 500;
+}
+
+.bloque-conclusion img.icono-conclusion {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+
+
+ul.lista-destacada {
+  background-color: inherit;
+  list-style: disc;
+  margin-top: 0.4em;
+}
+
+/* Ítems comunes: interlineado + justificado */
+ul.lista-destacada li {
+  margin-bottom: 0.4em;
+  position: relative;
+  color: inherit;        /* toma el color del contenedor */
+  font-size: 1em;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* Ítems con imagen personalizada */
+ul.lista-destacada li.custom-bullet {
+  list-style-type: none;
+  padding-left: 2em;
+}
+
+/* Imagen como bullet */
+ul.lista-destacada li .icono-bullet {
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.2em;
+  height: 1.2em;
+  object-fit: contain;
+}
+
+ul.viñeta-tema.tema-color.lista-destacada {
+  background-color: var(--color-suave) !important;
+}
+
+/*PRUEBA ACORDEÓN GPT*/
+.accordion {
+margin: 1em 0;
+}
+/* ——— Estilo “caja de pregunta” estilo ChatGPT ——— */
+.accordion-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 0.75em 1em;
+background-color: #ffffff;      /* fondo blanco */
+border: 1px solid #d1d5db;      /* borde gris claro */
+border-radius: 0.75em;          /* esquinas redondeadas */
+font-family: 'Poppins', sans-serif;
+font-size: 1em;
+color: #111;
+cursor: pointer;
+transition: background-color 0.2s ease;
+}
+.accordion-header:hover {
+background-color: #f7f8fa;
+}
+
+/* ——— Logo ChatGPT al inicio de la respuesta ——— */
+.accordion-content {
+position: relative;
+padding: 2em 2em 2em 2.5em;  /* espacio para el logo */
+}
+.accordion-content::before {
+content: '';
+position: absolute;
+top: 1em;
+left: 1em;
+width: 1.5em;
+height: 1.5em;
+background: url('https://chat.openai.com/favicon.ico') no-repeat center;
+background-size: contain;
+}
+
+/* 1) Cabecera en fila con wrapping */
+.accordion-header {
+  display: flex;
+  flex-wrap: wrap;            /* permite “bajar” el bloque de acciones */
+  align-items: flex-start;
+  padding: 0.75em 1em;
+  position: relative;
+}
+
+
+/* 3) Contenedor de acciones en su propia línea, botón a la derecha */
+.accordion-header .header-actions {
+  flex: 1 1 100%;             /* fuerza línea nueva */
+  display: flex;
+  justify-content: flex-end;  /* botón al final (derecha) */
+  margin-top: 0.5em;
+}
+
+/* 4) Botón circular sin fondo, sin padding extra */
+.btn-circle {
+  background: transparent !important;
+  width: 3rem;
+  height: 3rem;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.btn-circle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  margin: 0;
+}
+
+/* 5) Asegurar Poppins en todo el acordeón */
+.accordion-header,
+.accordion-content {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+
+
+/* === ACORDEÓN ESTILO NAPKIN AI === */
+.napkin-accordion {
+  margin: 2em 0;
+}
+
+.napkin-item {
+  margin-bottom: 1.5em;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #ddd;
+}
+
+.napkin-header {
+  background-color: #fdfdfd;
+  background-image: linear-gradient(to bottom, transparent 90%, rgba(0, 0, 0, 0.05) 90%);
+  background-size: 100% 2.5em;
+  cursor: pointer;
+  padding: 1.5em;
+  transition: background-color 0.2s ease;
+}
+
+.napkin-header:hover {
+  background-color: #fefbe8;
+}
+
+.napkin-texto {
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  font-size: 1em;
+  line-height: 1.6;
+}
+
+.napkin-texto h3 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-top: 0;
+}
+
+.napkin-texto ul,
+.napkin-texto ol {
+  padding-left: 1.2em;
+  margin-top: 0.5em;
+}
+
+.napkin-texto li {
+  margin-bottom: 0.3em;
+}
+
+.napkin-content {
+  display: none;
+  padding: 0;
+  background-color: #fff;
+  border-top: 1px dashed var(--color-principal);
+  text-align: center;
+}
+
+.napkin-content img {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+
+
+/*PRUEBA AVANZAR ENTRE SECCIONES OCULTAS*/
+
+.navegacion-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* ✅ asegura que ocupe todo el contenedor padre */
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+}
+
+.navegacion-sub.solo-anterior {
+  justify-content: flex-start;
+}
+
+.navegacion-sub.solo-siguiente {
+  justify-content: flex-end;
+}
+
+.boton-circular {
+  width: 60px;
+  height: 60px;
+  background-color: #f25c66;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.boton-circular img {
+  width: 24px;
+  height: 24px;
+}
+
+.boton-circular:hover {
+  background-color: #e04852;
+}
+
+
+
+/* En pantallas muy pequeñas, ocupan todo el ancho */
+@media (max-width: 480px) {
+  .nav-btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* === MEDIA QUERIES === */
+@media (max-width: 768px) {
+  #menu-container {
+    flex-direction: column;
+  }
+
+  #sidebar {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 6px;
+    overflow-x: hidden;
+    gap: 0;
+  }
+
+  .item-menu {
+    flex-direction: column;
+    margin: 0 4px;
+  }
+
+  .dos-columnas {
+    flex-direction: column;
+  }
+
+  .dos-columnas p {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+
+  .popup-box {
+    max-width: 90vw !important;
+    white-space: normal !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+  .fila {
+    flex-direction: column;
+  }
+
+  .columna-titulo {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .columna-contenido {
+    border-top: 2px solid var(--color-principal); /* línea arriba del contenido en móviles */
+    padding-top: 12px;
+  }
+
+}
+  
