@@ -78,59 +78,39 @@ Estos archivos virtuales se organizan bajo la estructura del directorio sincroni
 
 ---
 
-## 3. Orquestación Multi-Agente (`agents.py`)
+## 3. Orquestación Multi-Agente en Paralelo (`LangGraph`)
 
-Al enviar una solicitud a `/evaluate`, el sistema activa un flujo coordinado entre 5 agentes de IA autónomos basados en **Gemini 2.5 Flash**:
+Al enviar una solicitud a `/evaluate`, el sistema inicia un flujo de trabajo asíncrono y en paralelo coordinado por **LangGraph** (`rubricai_ai/graph.py`). La arquitectura implementa una topología de bifurcación y unificación (**Fan-out / Fan-in**) que divide la auditoría en tareas paralelas e independientes:
 
 ```mermaid
-sequenceDiagram
-    participant M as Moodle / Astro
-    participant C as Coordinator Agent
-    participant F as Format/Structure Agent
-    participant H as Holistic Alignment Agent
-    participant O as Ontology Agent
-    participant S as Synthesis Agent
-    participant N as Neo4j DB
-
-    M->>C: POST /evaluate (Payload del Curso)
-    activate C
-    Note over C: Orquesta y distribuye la metadata
+graph TD
+    START([START]) --> classify[classify: Carga rúbrica]
     
-    C->>F: Auditar campos técnicos de Moodle
-    activate F
-    Note over F: Revisa fechas, descripciones vacías, cuestionarios vacíos
-    F-->>C: Reporte de formato
-    deactivate F
-
-    C->>H: Auditar alineación constructiva (RAG)
-    activate H
-    Note over H: Compara actividades vs rúbrica y taxonomía Bloom
-    H-->>C: Reporte pedagógico
-    deactivate H
-
-    C->>O: Sincronizar grafo en base de datos
-    activate O
-    Note over O: Mapea curso, actividades y recomendaciones
-    O->>N: Cypher (MERGE & CREATE)
-    O-->>C: Estado del grafo
-    deactivate O
-
-    C->>S: Consolidar y sintetizar reportes
-    activate S
-    Note over S: Calcula puntaje final y arma el plan de acción estructurado
-    S-->>C: JSON consolidado
-    deactivate S
-
-    C-->>M: Respuesta estructurada de la auditoría
-    deactivate C
+    %% Fan-out
+    classify --> analyze_activities[analyze_activities: Grupo Actividades]
+    classify --> analyze_resources[analyze_resources: Grupo Recursos RAG]
+    classify --> ontology[ontology: Grafo Neo4j]
+    
+    %% Fan-in
+    analyze_activities --> synthesis[synthesis: Consolidar reportes]
+    analyze_resources --> synthesis
+    ontology --> synthesis
+    
+    synthesis --> persist[persist: Guardar en Neo4j]
+    persist --> END([END])
 ```
 
-### Funciones de los Agentes:
-1. **Coordinator Agent**: Recibe el payload del curso, coordina la llamada a los agentes de especialidad y transfiere los resultados.
-2. **Format/Structure Agent**: Audita parámetros formales del curso (inconsistencias en plazos, ponderaciones de cuestionarios, actividades sin descripción o bancos de preguntas vacíos).
-3. **Holistic Alignment Agent**: Evalúa la alineación pedagógica profunda. Utiliza RAG para contrastar la complejidad cognitiva de las actividades (según la taxonomía de Bloom) con los materiales del curso y la rúbrica de calidad.
-4. **Ontology Agent**: Se encarga de mapear las actividades y recomendaciones directamente en la base de datos de grafos de Neo4j.
-5. **Synthesis Agent**: Consolida el diagnóstico final en un puntaje global (`overall_score`) y una lista de recomendaciones accionables de cambio con la estructura: `Elemento`, `Tipo (Formato/Pedagógico)`, `Problema Detectado` y `Acción de Cambio sugerida`.
+### Flujo de Auditoría y Agentes Involucrados:
+1. **Fase Inicial (`classify`):** Recupera la rúbrica institucional desde Neo4j.
+2. **Fase Paralela (Fan-out):** Ejecuta tres ramas de forma simultánea reduciendo notablemente los tiempos de respuesta:
+   * **`analyze_activities`:** Evalúa secuencialmente las actividades de interacción pedagógica mediante el `HTMLContentAgent` (claridad y formato de consignas), `QuizAgent` (auditoría de cuestionarios y taxonomía de Bloom), `AssignmentAgent` (tareas y fechas de corte) y `ForumAgent` (debates e interacciones).
+   * **`analyze_resources`:** Audita los materiales y soportes teóricos usando el `DocumentAgent` (RAG con embeddings y FAISS local), `YouTubeAgent` (descarga y análisis de transcripciones) y `URLResourceAgent` (links externos).
+   * **`ontology`:** Sincroniza la estructura pedagógica completa en Neo4j en paralelo.
+3. **Fase de Consolidación (Fan-in - `synthesis`):** Espera el término de todas las ramas e invoca al `SynthesisAgent` para calcular el puntaje general (`overall_score`) y estructurar el plan de acción en JSON.
+4. **Fase de Persistencia (`persist`):** Guarda los resultados finales en la base de datos de grafos de Neo4j.
+
+> [!TIP]
+> Para obtener una explicación técnica detallada de la arquitectura de grafos de estado, definición de nodos y monitoreo jerárquico con LangSmith, consulta el [README de rubricai_ai](file:///run/media/cetec/c182e059-3c92-4885-9b5a-0b2f0aeaadfe/AIProjects/rubricAI/rubricai_ai/README.md).
 
 ---
 
