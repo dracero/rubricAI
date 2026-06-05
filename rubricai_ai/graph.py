@@ -315,12 +315,11 @@ def persist_node(state: EvaluationState) -> dict:
 
 def build_evaluation_graph() -> StateGraph:
     """
-    Builds and compiles the LangGraph evaluation graph with parallel execution.
+    Builds and compiles the LangGraph evaluation graph with sequential execution
+    to prevent concurrent API rate limits (429/503) on the Gemini Free Tier.
 
     Graph topology:
-      START → classify ──┬──→ analyze_activities ──┐
-                         ├──→ analyze_resources  ──┤──→ synthesis → persist → END
-                         └──→ ontology           ──┘
+      START → classify → ontology → analyze_activities → analyze_resources → synthesis → persist → END
     """
     graph = StateGraph(EvaluationState)
 
@@ -332,20 +331,12 @@ def build_evaluation_graph() -> StateGraph:
     graph.add_node("synthesis", synthesis_node)
     graph.add_node("persist", persist_node)
 
-    # Edges: START → classify
+    # Sequential edges to guarantee single-threaded LLM requests
     graph.add_edge(START, "classify")
-
-    # Fan-out: classify → three parallel branches
-    graph.add_edge("classify", "analyze_activities")
-    graph.add_edge("classify", "analyze_resources")
     graph.add_edge("classify", "ontology")
-
-    # Fan-in: all three branches → synthesis
-    graph.add_edge("analyze_activities", "synthesis")
+    graph.add_edge("ontology", "analyze_activities")
+    graph.add_edge("analyze_activities", "analyze_resources")
     graph.add_edge("analyze_resources", "synthesis")
-    graph.add_edge("ontology", "synthesis")
-
-    # synthesis → persist → END
     graph.add_edge("synthesis", "persist")
     graph.add_edge("persist", END)
 

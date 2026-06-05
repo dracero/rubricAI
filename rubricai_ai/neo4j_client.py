@@ -24,20 +24,47 @@ class Neo4jClient:
         self.username = os.getenv("NEO4J_USERNAME", "neo4j")
         self.password = os.getenv("NEO4J_PASSWORD", "password")
         self.database = os.getenv("NEO4J_DATABASE", "neo4j")
+        self.rubrics_database = os.getenv("NEO4J_RUBRICS_DATABASE", "rubricas")
         
-        logger.info(f"Connecting to Neo4j at {self.uri} (Database: {self.database})")
+        logger.info(f"Connecting to Neo4j at {self.uri} (Main DB: {self.database}, Rubrics DB: {self.rubrics_database})")
         
         try:
             self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
             # Test connection
             self.driver.verify_connectivity()
-            logger.info("Successfully connected to Neo4j database!")
+            logger.info("Successfully connected to Neo4j server!")
             self.initialized = True
-            # Create constraints and seed default ontology
-            self.init_database()
+            
+            # Try to create the secondary database for rubrics
+            self.try_create_database(self.rubrics_database)
+            
+            # Create constraints and seed default ontology on both databases
+            self.init_database(self.database)
+            if self.rubrics_database != self.database:
+                self.init_database(self.rubrics_database)
         except Exception as e:
             logger.error(f"Error connecting to Neo4j: {e}")
             self.driver = None
+
+    def try_create_database(self, db_name: str):
+        """Attempts to create a new database on the Neo4j instance. Falls back to default if not supported."""
+        if not self.driver:
+            return
+        if db_name in ["system", "neo4j", self.database]:
+            return
+        try:
+            logger.info(f"Attempting to create database '{db_name}' IF NOT EXISTS...")
+            with self.driver.session(database="system") as session:
+                session.run(f"CREATE DATABASE {db_name} IF NOT EXISTS")
+            logger.info(f"Database '{db_name}' is ready.")
+        except Exception as e:
+            # Aura Free or Community edition single database limitation will throw an error.
+            # We catch it and gracefully fall back to the default user database.
+            logger.warning(
+                f"Could not create Neo4j database '{db_name}' (this is normal on Aura Free or local Community Edition). "
+                f"Falling back to default database '{self.database}'. Details: {e}"
+            )
+            self.rubrics_database = self.database
 
     def close(self):
         if self.driver:
@@ -45,36 +72,38 @@ class Neo4jClient:
             logger.info("Neo4j connection closed.")
 
     @trace_db(name="neo4j_query")
-    def query(self, cypher, parameters=None):
+    def query(self, cypher, parameters=None, database=None):
+        target_db = database or self.database
         # Add query metadata for LangSmith tracing
         add_run_metadata({
             "cypher": cypher[:500] if cypher else "",
             "has_parameters": parameters is not None,
             "parameter_keys": list((parameters or {}).keys()),
+            "target_db": target_db,
         })
 
         if not self.initialized or not self.driver:
             logger.error("Neo4j driver is not initialized.")
             return []
         
-        with self.driver.session(database=self.database) as session:
+        with self.driver.session(database=target_db) as session:
             try:
                 result = session.run(cypher, parameters)
                 records = [record.data() for record in result]
                 add_run_metadata({"result_count": len(records)})
                 return records
             except Exception as e:
-                logger.error(f"Error executing Cypher query: {e}\nQuery: {cypher}")
+                logger.error(f"Error executing Cypher query on database '{target_db}': {e}\nQuery: {cypher}")
                 raise e
 
-    def init_database(self):
-        """Create constraints, indexes and seed pedagogical ontology if empty."""
+    def init_database(self, db_name: str):
+        """Create constraints, indexes and seed pedagogical ontology if empty on the target database."""
         try:
             # Create constraints
-            self.query("CREATE CONSTRAINT unique_rubric_id IF NOT EXISTS FOR (r:Rubric) REQUIRE r.id IS UNIQUE")
-            self.query("CREATE CONSTRAINT unique_course_id IF NOT EXISTS FOR (c:Course) REQUIRE c.id IS UNIQUE")
-            self.query("CREATE CONSTRAINT unique_bloom_level IF NOT EXISTS FOR (b:BloomLevel) REQUIRE b.level IS UNIQUE")
-            self.query("CREATE CONSTRAINT unique_dimension IF NOT EXISTS FOR (d:PedagogicalDimension) REQUIRE d.name IS UNIQUE")
+            self.query("CREATE CONSTRAINT unique_rubric_id IF NOT EXISTS FOR (r:Rubric) REQUIRE r.id IS UNIQUE", database=db_name)
+            self.query("CREATE CONSTRAINT unique_course_id IF NOT EXISTS FOR (c:Course) REQUIRE c.id IS UNIQUE", database=db_name)
+            self.query("CREATE CONSTRAINT unique_bloom_level IF NOT EXISTS FOR (b:BloomLevel) REQUIRE b.level IS UNIQUE", database=db_name)
+            self.query("CREATE CONSTRAINT unique_dimension IF NOT EXISTS FOR (d:PedagogicalDimension) REQUIRE d.name IS UNIQUE", database=db_name)
             
             # Seed Bloom Taxonomy levels
             bloom_levels = [
@@ -89,7 +118,8 @@ class Neo4jClient:
             for b in bloom_levels:
                 self.query(
                     "MERGE (b:BloomLevel {level: $level}) ON CREATE SET b.description = $desc",
-                    {"level": b["level"], "desc": b["desc"]}
+                    {"level": b["level"], "desc": b["desc"]},
+                    database=db_name
                 )
 
             # Seed Pedagogical Dimensions
@@ -103,18 +133,19 @@ class Neo4jClient:
             for d in dimensions:
                 self.query(
                     "MERGE (d:PedagogicalDimension {name: $name}) ON CREATE SET d.description = $desc",
-                    {"name": d["name"], "desc": d["desc"]}
+                    {"name": d["name"], "desc": d["desc"]},
+                    database=db_name
                 )
                 
-            logger.info("Neo4j Database initialized with default constraints and seed ontology.")
+            logger.info(f"Neo4j Database '{db_name}' initialized with default constraints and seed ontology.")
         except Exception as e:
-            logger.error(f"Failed to initialize database constraints: {e}")
+            logger.error(f"Failed to initialize database '{db_name}' constraints: {e}")
 
     # --- Rubric Persistence Methods ---
 
     @trace_db(name="neo4j_save_rubric")
     def save_rubric(self, rubric_data: dict) -> str:
-        """Saves a rubric dictionary to Neo4j as a structured graph."""
+        """Saves a rubric dictionary to Neo4j as a structured graph in the dedicated rubrics database."""
         rubric_id = rubric_data.get("id") or f"rubric_{int(datetime.now().timestamp())}"
         title = rubric_data.get("title", "Sin título")
         description = rubric_data.get("description", "")
@@ -124,16 +155,19 @@ class Neo4jClient:
             "rubric_id": rubric_id,
             "title": title,
             "n_criteria": len(criteria),
+            "target_db": self.rubrics_database
         })
         
-        # 0. Delete ALL existing rubrics, criteria, and levels to ensure only ONE active rubric exists
+        # 0. Delete ONLY the rubric with this ID if it exists (so we overwrite it without deleting others)
         self.query(
             """
-            MATCH (r:Rubric)
+            MATCH (r:Rubric {id: $id})
             OPTIONAL MATCH (r)-[:HAS_CRITERION]->(c:Criterion)
             OPTIONAL MATCH (c)-[:HAS_LEVEL]->(l:Level)
             DETACH DELETE r, c, l
-            """
+            """,
+            {"id": rubric_id},
+            database=self.rubrics_database
         )
         
         # 1. Create Rubric Node
@@ -144,17 +178,19 @@ class Neo4jClient:
                 r.description = $description,
                 r.updated_at = timestamp()
             """,
-            {"id": rubric_id, "title": title, "description": description}
+            {"id": rubric_id, "title": title, "description": description},
+            database=self.rubrics_database
         )
         
-        # 2. Clear old criteria for this rubric (if updating)
+        # 2. Clear old criteria for this rubric (redundant but safe if node wasn't fully detached)
         self.query(
             """
             MATCH (r:Rubric {id: $id})-[rel:HAS_CRITERION]->(c:Criterion)
             OPTIONAL MATCH (c)-[lrel:HAS_LEVEL]->(l:Level)
             DETACH DELETE c, l
             """,
-            {"id": rubric_id}
+            {"id": rubric_id},
+            database=self.rubrics_database
         )
         
         # 3. Create new criteria and levels
@@ -187,7 +223,8 @@ class Neo4jClient:
                     "weight": crit_weight,
                     "order": idx,
                     "dim": dimension
-                }
+                },
+                database=self.rubrics_database
             )
             
             # Create Levels for this criterion
@@ -215,7 +252,8 @@ class Neo4jClient:
                         "score": lvl_score,
                         "desc": lvl_desc,
                         "order": l_idx
-                    }
+                    },
+                    database=self.rubrics_database
                 )
                 
         return rubric_id
@@ -223,9 +261,9 @@ class Neo4jClient:
     @trace_db(name="neo4j_get_rubric")
     def get_rubric(self, rubric_id: str) -> dict:
         """Retrieves a full rubric from Neo4j."""
-        add_run_metadata({"rubric_id": rubric_id})
+        add_run_metadata({"rubric_id": rubric_id, "target_db": self.rubrics_database})
 
-        rubric_res = self.query("MATCH (r:Rubric {id: $id}) RETURN r", {"id": rubric_id})
+        rubric_res = self.query("MATCH (r:Rubric {id: $id}) RETURN r", {"id": rubric_id}, database=self.rubrics_database)
         if not rubric_res:
             return None
             
@@ -239,7 +277,8 @@ class Neo4jClient:
             RETURN c, d.name as dimension
             ORDER BY rel.order ASC
             """,
-            {"id": rubric_id}
+            {"id": rubric_id},
+            database=self.rubrics_database
         )
         
         criteria = []
@@ -254,7 +293,8 @@ class Neo4jClient:
                 RETURN l
                 ORDER BY rel.order ASC
                 """,
-                {"crit_id": c_node["id"]}
+                {"crit_id": c_node["id"]},
+                database=self.rubrics_database
             )
             
             levels = [l_row["l"] for l_row in levels_res]
@@ -279,7 +319,10 @@ class Neo4jClient:
     @trace_db(name="neo4j_list_rubrics")
     def list_rubrics(self) -> list:
         """Lists all rubrics in the database (summary mode)."""
-        results = self.query("MATCH (r:Rubric) RETURN r.id as id, r.title as title, r.description as description")
+        results = self.query(
+            "MATCH (r:Rubric) RETURN r.id as id, r.title as title, r.description as description",
+            database=self.rubrics_database
+        )
         add_run_metadata({"rubrics_count": len(results)})
         return results
 

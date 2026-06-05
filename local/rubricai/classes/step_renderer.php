@@ -45,10 +45,14 @@ class step_renderer {
         \context $context,
         bool $is_ajax
     ): void {
-        global $PAGE;
+        global $PAGE, $CFG;
 
-        // Subtitle
+        // Header bar with subtitle and link to go back to course view
+        $courseurl = new \moodle_url('/course/view.php', ['id' => $id]);
+        echo \html_writer::start_tag('div', ['class' => 'rubricai-header-bar']);
         echo \html_writer::tag('p', 'RubricAI · Prototipo', ['class' => 'rubricai-subtitle']);
+        echo \html_writer::link($courseurl, '← Volver al Curso', ['class' => 'rubricai-back-link']);
+        echo \html_writer::end_tag('div');
 
         // Tabs
         self::render_tabs($action, $id);

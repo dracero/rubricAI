@@ -29,7 +29,7 @@ def main():
     )
     
     try:
-        res = urllib.request.urlopen(req_api, timeout=120)
+        res = urllib.request.urlopen(req_api, timeout=240)
         result = json.loads(res.read().decode('utf-8'))
         print("\n=== EVALUATION RESULTS ===")
         print(json.dumps(result, indent=2, ensure_ascii=False))

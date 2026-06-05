@@ -1,10 +1,56 @@
 import os
 import logging
+import time
+import threading
 from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 from tracing import trace_llm_call, get_traced_openai_client, add_run_metadata
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Global Rate Limiter (prevents 429 errors on Gemini Free Tier)
+# ---------------------------------------------------------------------------
+
+class _RateLimiter:
+    """
+    Thread-safe rate limiter that enforces a minimum interval between API
+    calls so the total RPM never exceeds the configured limit.
+
+    Free-tier Gemini 2.5 Flash: 10 RPM → min 6s between requests.
+    We add a 1s safety margin → 7s effective gap.
+    """
+
+    def __init__(self, max_rpm: int | None = None):
+        rpm = max_rpm or int(os.getenv("GEMINI_RPM_LIMIT", "10"))
+        safety_margin = 1.0  # extra second of buffer
+        self._min_interval = (60.0 / rpm) + safety_margin
+        self._lock = threading.Lock()
+        self._last_request_time = 0.0
+        logger.info(
+            f"Rate limiter initialised: {rpm} RPM → "
+            f"{self._min_interval:.1f}s min gap between requests"
+        )
+
+    def wait(self):
+        """Block the calling thread until it is safe to fire the next request."""
+        with self._lock:
+            now = time.monotonic()
+            elapsed = now - self._last_request_time
+            if elapsed < self._min_interval:
+                sleep_time = self._min_interval - elapsed
+                logger.info(
+                    f"⏳ Rate limiter: waiting {sleep_time:.1f}s before next LLM call"
+                )
+                time.sleep(sleep_time)
+            self._last_request_time = time.monotonic()
+
+
+# Singleton — shared across all agents / threads
+_rate_limiter = _RateLimiter()
 
 class LLMProvider(ABC):
     @abstractmethod
@@ -99,26 +145,45 @@ class GoogleProvider(LLMProvider):
 
     @trace_llm_call(name="google_gemini_completion", metadata={"ls_provider": "google"})
     def generate_completion(self, prompt: str, system_prompt: str) -> tuple[str, dict]:
+        from openai import RateLimitError, InternalServerError, APIConnectionError, APITimeoutError
+        import random
         add_run_metadata({"ls_model_name": self.model})
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-            content = response.choices[0].message.content
-            usage = {
-                "input_tokens": response.usage.prompt_tokens if response.usage else 0,
-                "output_tokens": response.usage.completion_tokens if response.usage else 0,
-                "total_tokens": response.usage.total_tokens if response.usage else 0
-            }
-            add_run_metadata({"usage": usage})
-            return content, usage
-        except Exception as e:
-            logging.exception("Exception during Google Gemini call")
-            return None, None
+        
+        max_retries = 8
+        backoff_factor = 2.0
+        
+        for attempt in range(max_retries):
+            try:
+                # Proactive throttle: wait until RPM budget allows a new request
+                _rate_limiter.wait()
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ]
+                )
+                content = response.choices[0].message.content
+                usage = {
+                    "input_tokens": response.usage.prompt_tokens if response.usage else 0,
+                    "output_tokens": response.usage.completion_tokens if response.usage else 0,
+                    "total_tokens": response.usage.total_tokens if response.usage else 0
+                }
+                add_run_metadata({"usage": usage})
+                return content, usage
+            except (RateLimitError, InternalServerError, APIConnectionError, APITimeoutError) as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Max retries reached for Google Gemini transient error: {e}")
+                    raise e
+                # Wait with exponential backoff + jitter to handle parallel agents, rate limits, or high demand
+                sleep_time = (backoff_factor ** attempt) + random.uniform(1.0, 3.0)
+                err_name = type(e).__name__
+                status_str = f"status={e.status_code}" if hasattr(e, "status_code") else "connection/timeout"
+                logger.warning(f"Gemini API transient error ({err_name}, {status_str}). Retrying in {sleep_time:.2f}s... (Attempt {attempt+1}/{max_retries})")
+                time.sleep(sleep_time)
+            except Exception as e:
+                logging.exception("Exception during Google Gemini call")
+                return None, None
 
 def get_llm_provider() -> LLMProvider:
     provider_name = os.getenv("LLM_PROVIDER", "dashscope").lower()

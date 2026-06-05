@@ -102,6 +102,40 @@ def _get_youtube_transcript(video_id: str) -> Optional[str]:
         logger.warning(f"Could not fetch transcript for YouTube video {video_id}: {e}")
         return None
 
+def _scrape_url(url: str) -> Optional[str]:
+    """Fetch external web page content and clean it to extract main text."""
+    if not url:
+        return None
+    try:
+        from bs4 import BeautifulSoup
+        import urllib.request
+        
+        # Configure headers to mimic a real browser to avoid blocks
+        req = urllib.request.Request(
+            url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'}
+        )
+        
+        # Fetch content with 8s timeout to avoid blocking the agent graph
+        with urllib.request.urlopen(req, timeout=8) as response:
+            html = response.read()
+            
+        soup = BeautifulSoup(html, "lxml")
+        
+        # Decompose script, style, nav, footer, header to get clean body text
+        for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
+            tag.decompose()
+            
+        text = soup.get_text(separator="\n", strip=True)
+        # Collapse multiple spaces and newlines
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        text = re.sub(r' +', ' ', text)
+        
+        return text.strip() if text.strip() else None
+    except Exception as e:
+        logger.warning(f"Could not scrape URL {url}: {e}")
+        return None
+
 
 # ---------------------------------------------------------------------------
 # 1. DocumentAgent
@@ -317,11 +351,16 @@ class URLResourceAgent:
             url = r.get("externalurl", "") or r.get("url", "")
             intro = r.get("intro", "")
 
+            # Fetch the actual content of the web page
+            scraped_content = _scrape_url(url)
+            scraped_excerpt = scraped_content[:2000] if scraped_content else "(No se pudo extraer el texto de la página o sitio bloqueado)"
+
             url_details.append({
                 "name": r.get("name", "Sin nombre"),
                 "section": r.get("section_name", ""),
                 "url": url,
                 "description": _clean_html_basic(intro)[:300] if intro else "(Sin descripción)",
+                "scraped_text_excerpt": scraped_excerpt
             })
 
         url_str = json.dumps(url_details, indent=2, ensure_ascii=False)
@@ -330,13 +369,13 @@ class URLResourceAgent:
         system_prompt = (
             "Eres el Agente de Análisis de URLs Externas. Tu tarea es evaluar los enlaces "
             "a recursos externos del curso, analizando su relevancia pedagógica, diversidad "
-            "de fuentes y alineación con la rúbrica."
+            "de fuentes, alineación con la rúbrica y evaluando el contenido real extraído de dichos sitios web."
         )
 
         prompt = f"""
-        Analiza los siguientes enlaces a recursos externos del curso:
+        Analiza los siguientes enlaces a recursos externos del curso (incluyendo el texto real extraído de ellos):
 
-        ### ENLACES EXTERNOS:
+        ### ENLACES EXTERNOS (CON CONTENIDO WEB EXTRAÍDO):
         {url_str}
 
         ### RÚBRICA DE REFERENCIA:
@@ -344,12 +383,13 @@ class URLResourceAgent:
 
         ### TAREA:
         1. Evalúa cada enlace externo:
-           - ¿El nombre y descripción sugieren relevancia pedagógica?
+           - ¿El nombre, descripción y el CONTENIDO REAL del sitio web sugieren relevancia pedagógica?
            - ¿La URL apunta a una fuente confiable (universidades, repositorios educativos, etc.)?
+           - Analiza si los temas tratados en el sitio web (texto extraído) están alineados con los criterios de la rúbrica.
         2. Evalúa la diversidad de fuentes externas.
-        3. Identifica posibles problemas (enlaces sin descripción, fuentes poco confiables).
+        3. Identifica posibles problemas (enlaces sin descripción, fuentes poco confiables, contenido inadecuado o inaccesible).
         4. Evalúa la alineación global de los recursos externos con la rúbrica.
-        5. Escribe un informe detallado en español.
+        5. Escribe un informe detallado en español con viñetas claras.
         """
 
         res, _ = generate_completion(prompt, system_prompt)

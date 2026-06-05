@@ -29,7 +29,7 @@ class data_provider {
         $data = [
             'fullname' => $course->fullname,
             'shortname' => $course->shortname,
-            'summary' => strip_tags($course->summary),
+            'summary' => self::clean_html($course->summary),
             'sections' => []
         ];
 
@@ -37,7 +37,7 @@ class data_provider {
             if ($section->uservisible && ($section->summary || !empty($modinfo->sections[$section->section]))) {
                 $sectiondata = [
                     'name' => self::get_section_name_clean($course, $section),
-                    'summary' => strip_tags($section->summary),
+                    'summary' => self::clean_html($section->summary),
                     'activities' => []
                 ];
 
@@ -48,7 +48,7 @@ class data_provider {
                             $sectiondata['activities'][] = [
                                 'name' => $cm->name,
                                 'type' => $cm->modname,
-                                'description' => strip_tags($cm->content) // Simplificado
+                                'description' => self::clean_html($cm->content) // Simplificado
                             ];
                         }
                     }
@@ -1135,7 +1135,7 @@ class data_provider {
             'id' => $courseid,
             'fullname' => $course->fullname,
             'shortname' => $course->shortname,
-            'summary' => strip_tags($course->summary),
+            'summary' => self::clean_html($course->summary),
             'sections' => []
         ];
         
@@ -1145,7 +1145,7 @@ class data_provider {
             $sectiondata = [
                 'num' => (int)$section->section,
                 'name' => self::get_section_name_clean($course, $section),
-                'summary' => strip_tags($section->summary),
+                'summary' => self::clean_html($section->summary),
                 'activities' => []
             ];
             
@@ -1167,7 +1167,7 @@ class data_provider {
                     if ($cm->modname === 'assign') {
                         $record = $DB->get_record('assign', ['id' => $cm->instance]);
                         if ($record) {
-                            $desc = preg_replace('/\s+/', ' ', strip_tags($record->intro));
+                            $desc = preg_replace('/\s+/', ' ', self::clean_html($record->intro));
                             $act['description'] = strlen($desc) > 1000 ? substr($desc, 0, 1000) . '...' : $desc;
                             $act['settings'] = [
                                 'duedate' => (int)$record->duedate,
@@ -1179,7 +1179,7 @@ class data_provider {
                     } else if ($cm->modname === 'forum') {
                         $record = $DB->get_record('forum', ['id' => $cm->instance]);
                         if ($record) {
-                            $desc = preg_replace('/\s+/', ' ', strip_tags($record->intro));
+                            $desc = preg_replace('/\s+/', ' ', self::clean_html($record->intro));
                             $act['description'] = strlen($desc) > 1000 ? substr($desc, 0, 1000) . '...' : $desc;
                             $act['settings'] = [
                                 'type' => $record->type,
@@ -1190,7 +1190,7 @@ class data_provider {
                     } else if ($cm->modname === 'quiz') {
                         $record = $DB->get_record('quiz', ['id' => $cm->instance]);
                         if ($record) {
-                            $desc = preg_replace('/\s+/', ' ', strip_tags($record->intro));
+                            $desc = preg_replace('/\s+/', ' ', self::clean_html($record->intro));
                             $act['description'] = strlen($desc) > 1000 ? substr($desc, 0, 1000) . '...' : $desc;
                             $act['settings'] = [
                                 'timeopen' => (int)$record->timeopen,
@@ -1221,7 +1221,7 @@ class data_provider {
                             }
                             if ($qrecords) {
                                 foreach ($qrecords as $qr) {
-                                    $qtext = preg_replace('/\s+/', ' ', strip_tags($qr->questiontext));
+                                    $qtext = preg_replace('/\s+/', ' ', self::clean_html($qr->questiontext));
                                     $questions[] = [
                                         'id' => (int)$qr->id,
                                         'name' => $qr->name,
@@ -1247,7 +1247,7 @@ class data_provider {
                                 $act['settings']['externalurl'] = $record->externalurl;
                             }
                         }
-                        $cleaned_desc = preg_replace('/\s+/', ' ', strip_tags($desc));
+                        $cleaned_desc = preg_replace('/\s+/', ' ', self::clean_html($desc));
                         $act['description'] = strlen($cleaned_desc) > 1000 ? substr($cleaned_desc, 0, 1000) . '...' : $cleaned_desc;
                     }
                     
@@ -1337,38 +1337,38 @@ class data_provider {
             if ($cm->modname === 'assign') {
                 $record = $DB->get_record('assign', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Instrucciones de la tarea:\n" . strip_tags($record->intro);
+                    $text .= "Instrucciones de la tarea:\n" . self::clean_html($record->intro);
                 }
             } else if ($cm->modname === 'forum') {
                 $record = $DB->get_record('forum', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Descripción del foro:\n" . strip_tags($record->intro);
+                    $text .= "Descripción del foro:\n" . self::clean_html($record->intro);
                 }
             } else if ($cm->modname === 'page') {
                 $record = $DB->get_record('page', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Descripción:\n" . strip_tags($record->intro) . "\n\nContenido de la página:\n" . strip_tags($record->content);
+                    $text .= "Descripción:\n" . self::clean_html($record->intro) . "\n\nContenido de la página:\n" . self::clean_html($record->content);
                 }
             } else if ($cm->modname === 'url') {
                 $record = $DB->get_record('url', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Descripción:\n" . strip_tags($record->intro) . "\nURL: " . $record->externalurl;
+                    $text .= "Descripción:\n" . self::clean_html($record->intro) . "\nURL: " . $record->externalurl;
                 }
             } else if ($cm->modname === 'book') {
                 $record = $DB->get_record('book', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Libro: " . $record->name . "\n" . strip_tags($record->intro) . "\n\nCapítulos:\n";
+                    $text .= "Libro: " . $record->name . "\n" . self::clean_html($record->intro) . "\n\nCapítulos:\n";
                     $chapters = $DB->get_records('book_chapters', ['bookid' => $record->id], 'pagenum');
                     if ($chapters) {
                         foreach ($chapters as $ch) {
-                            $text .= "\nTítulo: " . $ch->title . "\n" . strip_tags($ch->content);
+                            $text .= "\nTítulo: " . $ch->title . "\n" . self::clean_html($ch->content);
                         }
                     }
                 }
             } else if ($cm->modname === 'quiz') {
                 $record = $DB->get_record('quiz', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Descripción del cuestionario:\n" . strip_tags($record->intro) . "\n\nPreguntas:\n";
+                    $text .= "Descripción del cuestionario:\n" . self::clean_html($record->intro) . "\n\nPreguntas:\n";
                     $has_question_refs = $DB->get_manager()->table_exists('question_references');
                     if ($has_question_refs) {
                         $sql = "SELECT q.id, q.name, q.questiontext
@@ -1388,24 +1388,46 @@ class data_provider {
                     }
                     if ($qrecords) {
                         foreach ($qrecords as $qr) {
-                            $text .= "- " . $qr->name . ": " . strip_tags($qr->questiontext) . "\n";
+                            $text .= "- " . $qr->name . ": " . self::clean_html($qr->questiontext) . "\n";
                         }
                     }
                 }
             } else if ($cm->modname === 'label') {
                 $record = $DB->get_record('label', ['id' => $cm->instance]);
                 if ($record) {
-                    $text .= "Contenido de la etiqueta:\n" . strip_tags($record->intro);
+                    $text .= "Contenido de la etiqueta:\n" . self::clean_html($record->intro);
                 }
             } else {
                 if ($cm->content) {
-                    $text .= "Detalles:\n" . strip_tags($cm->content);
+                     $text .= "Detalles:\n" . self::clean_html($cm->content);
                 }
             }
         } catch (\Exception $e) {
             $text .= "\nError al obtener detalles: " . $e->getMessage();
         }
 
+        return trim($text);
+    }
+
+    /**
+     * Cleans HTML content by removing style and script tags and their contents,
+     * stripping other HTML tags, and decoding entities.
+     *
+     * @param string $html
+     * @return string
+     */
+    public static function clean_html(?string $html): string {
+        if (empty($html)) {
+            return '';
+        }
+        // Remove style blocks and their contents
+        $html = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', '', $html);
+        // Remove script blocks and their contents
+        $html = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html);
+        // Now strip tags
+        $text = strip_tags($html);
+        // Decode HTML entities
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         return trim($text);
     }
 }
