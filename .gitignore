@@ -14,7 +14,7 @@ venv/
 rubricai_ai/data/
 
 # Moodle data directory:
-# We EXCLUDE caches, sessions, secrets, temp files, and large backups, but ALLOW filedir (images) and structure
+# We EXCLUDE caches, sessions, secrets, temp files, large backups, and large media files
 moodledata/cache/
 moodledata/localcache/
 moodledata/sessions/
@@ -24,6 +24,9 @@ moodledata/muc/
 moodledata/secret/
 moodledata/backups/*.mbz
 moodledata/backups/*.zip
+moodledata/rubricai_sync/
+# Exclude large files in moodledata/filedir (videos, large media > 10MB)
+moodledata/filedir/
 
 # ZIP files (except packaging if any, but we ignore general zips)
 rubricai_plugin.zip

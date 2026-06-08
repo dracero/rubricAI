@@ -112,6 +112,8 @@ class action_handler {
         $selected_files_raw = optional_param('selected_files', '', PARAM_RAW);
         error_log("[RubricAI] handle_ingest course={$course_id} selected_files_raw=" . substr($selected_files_raw, 0, 300));
 
+        $base_sync_dir = rtrim($CFG->dataroot . '/rubricai_sync/course_' . $course_id, '/');
+
         if (!empty($selected_files_raw)) {
             $selected_files = json_decode($selected_files_raw, true);
 
@@ -122,8 +124,6 @@ class action_handler {
                 }, $selected_files);
 
                 error_log("[RubricAI] Selected files (" . count($selected_files) . "): " . implode(', ', $selected_files));
-
-                $base_sync_dir = rtrim($CFG->dataroot . '/rubricai_sync/course_' . $course_id, '/');
 
                 if (file_exists($base_sync_dir)) {
                     $directory = new \RecursiveDirectoryIterator($base_sync_dir, \RecursiveDirectoryIterator::SKIP_DOTS);
@@ -136,8 +136,7 @@ class action_handler {
                         $relative_path = str_replace('\\', '/', substr($file->getPathname(), strlen($base_sync_dir) + 1));
 
                         if (!in_array($relative_path, $selected_files)) {
-                            error_log("[RubricAI] Deleting unselected: {$relative_path}");
-                            @unlink($file->getPathname());
+                            error_log("[RubricAI] Unselected (skipping physical unlink): {$relative_path}");
                         } else {
                             error_log("[RubricAI] Keeping selected: {$relative_path}");
                         }

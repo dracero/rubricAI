@@ -42,7 +42,7 @@ class rag_client {
      * @param array $summary  Course summary from data_provider::get_course_summary()
      */
     public static function sync(array $summary): void {
-        $payload = json_encode(['course' => $summary, 'files' => []]);
+        $payload = json_encode(['course' => $summary, 'files' => []], JSON_INVALID_UTF8_SUBSTITUTE);
         self::post('/sync', $payload);
     }
 
@@ -56,6 +56,7 @@ class rag_client {
      * @return object|null  { status, chunks, ... }
      */
     public static function ingest(int $course_id, array $selected_files = [], string $base_sync_dir = ''): ?object {
+        error_log("[RubricAI] RAG Client ingest starting. Course: $course_id, base_sync_dir: $base_sync_dir, selected files count: " . count($selected_files));
         $post_data = ['course_id' => $course_id];
         
         if (!empty($base_sync_dir) && file_exists($base_sync_dir)) {
@@ -63,6 +64,7 @@ class rag_client {
             
             // If no specific files are provided, we scan the directory to send EVERYTHING
             if (empty($selected_files)) {
+                error_log("[RubricAI] selected_files is empty, scanning base_sync_dir: $base_sync_dir");
                 $directory = new \RecursiveDirectoryIterator($base_sync_dir, \RecursiveDirectoryIterator::SKIP_DOTS);
                 $iterator  = new \RecursiveIteratorIterator($directory);
                 foreach ($iterator as $file) {
@@ -70,9 +72,11 @@ class rag_client {
                     $relative_path = str_replace('\\', '/', substr($file->getPathname(), strlen($base_sync_dir) + 1));
                     $mime = mime_content_type($file->getPathname()) ?: 'application/octet-stream';
                     $post_data["files[$idx]"] = curl_file_create($file->getPathname(), $mime, $relative_path);
+                    error_log("[RubricAI] Ingesting scanned file files[$idx]: relative_path={$relative_path}, absolute_path=" . $file->getPathname());
                     $idx++;
                 }
             } else {
+                error_log("[RubricAI] selected_files is NOT empty, processing " . count($selected_files) . " items");
                 foreach ($selected_files as $relative_path) {
                     $file_path = $base_sync_dir . '/' . $relative_path;
                     if (file_exists($file_path)) {
@@ -80,13 +84,20 @@ class rag_client {
                         // curl_file_create allows us to send the file via multipart/form-data
                         // The 3rd parameter sets the 'filename' property in the HTTP request to the relative path
                         $post_data["files[$idx]"] = curl_file_create($file_path, $mime, $relative_path);
+                        error_log("[RubricAI] Ingesting selected file files[$idx]: relative_path={$relative_path}, absolute_path={$file_path}");
                         $idx++;
+                    } else {
+                        error_log("[RubricAI] WARNING: selected file does not exist on disk: {$file_path}");
                     }
                 }
             }
+            error_log("[RubricAI] RAG Client ingest constructed post_data with $idx files");
+        } else {
+            error_log("[RubricAI] ERROR: base_sync_dir either empty or does not exist: $base_sync_dir");
         }
 
         $response = self::post_multipart('/ingest', $post_data, 600, 30);
+        error_log("[RubricAI] RAG Client ingest got response: " . substr($response, 0, 500));
         return @json_decode($response);
     }
     
@@ -131,7 +142,7 @@ class rag_client {
      * @return object|null  { status, results[] }
      */
     public static function search(int $course_id, string $query): ?object {
-        $payload  = json_encode(['course_id' => $course_id, 'query' => $query]);
+        $payload  = json_encode(['course_id' => $course_id, 'query' => $query], JSON_INVALID_UTF8_SUBSTITUTE);
         $response = self::post('/search', $payload);
         return @json_decode($response);
     }
@@ -143,7 +154,7 @@ class rag_client {
      * @return object|null
      */
     public static function generate(array $data): ?object {
-        $response = self::post('/generate', json_encode($data), 600, 30);
+        $response = self::post('/generate', json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE), 600, 30);
         return @json_decode($response);
     }
 
@@ -154,7 +165,7 @@ class rag_client {
      * @return object|null  { status, system_prompt, user_prompt }
      */
     public static function preview_prompt(array $data): ?object {
-        $response = self::post('/preview', json_encode($data), 60, 20);
+        $response = self::post('/preview', json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE), 60, 20);
         return @json_decode($response);
     }
 
@@ -187,7 +198,7 @@ class rag_client {
             'rubric_id' => $rubric_id,
             'course_data' => $payload
         ];
-        $response = self::post('/evaluate', json_encode($data), 600, 30);
+        $response = self::post('/evaluate', json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE), 600, 30);
         return @json_decode($response);
     }
 

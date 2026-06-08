@@ -278,10 +278,13 @@ class data_provider {
             if (!$section->uservisible) continue;
             if (empty($modinfo->sections[$section->section])) continue;
 
-            $section_name = self::get_section_name_clean($course, $section);
+            $section_name_raw = self::get_section_name_clean($course, $section);
+            $section_name_clean = clean_param($section_name_raw, PARAM_FILE);
+            $section_folder_name = $section->section . '_' . ($section_name_clean ?: 'Section');
+
             $section_node = [
                 'id'         => $section->id,
-                'name'       => $section_name,
+                'name'       => $section_name_raw,
                 'type'       => 'section',
                 'activities' => []
             ];
@@ -290,6 +293,9 @@ class data_provider {
                 $cm = $modinfo->get_cm($cmid);
                 if (!$cm->uservisible) continue;
                 if (!in_array($cm->modname, self::RESOURCE_MODULES)) continue;
+
+                $activity_name_clean = clean_param($cm->name, PARAM_FILE);
+                $activity_folder_name = $cm->id . '_' . ($activity_name_clean ?: 'Activity');
 
                 $activity_node = [
                     'id'    => $cm->id,
@@ -312,8 +318,7 @@ class data_provider {
                         'id'      => 'virtual_' . $cm->id,
                         'name'    => $v_filename,
                         'type'    => 'file',
-                        'relpath' => $section->section . '_' . clean_param($section_name, PARAM_FILE) . '/' .
-                                     $cm->id . '_' . clean_param($cm->name, PARAM_FILE) . '/' . $v_filename
+                        'relpath' => $section_folder_name . '/' . $activity_folder_name . '/' . $v_filename
                     ];
                 }
 
@@ -341,8 +346,7 @@ class data_provider {
                             'id'      => $file->get_id(),
                             'name'    => $file->get_filename(),
                             'type'    => 'file',
-                            'relpath' => $section->section . '_' . clean_param($section_name, PARAM_FILE) . '/' .
-                                         $cm->id . '_' . clean_param($cm->name, PARAM_FILE) . '/' . $file->get_filename()
+                            'relpath' => $section_folder_name . '/' . $activity_folder_name . '/' . $file->get_filename()
                         ];
                     }
                 } catch (\Exception $e) {
@@ -1153,7 +1157,20 @@ class data_provider {
                 foreach ($modinfo->sections[$section->section] as $cmid) {
                     $cm = $modinfo->get_cm($cmid);
                     if (!$cm->uservisible) continue;
-                    if ($cm->modname === 'label') continue; // Skip labels entirely as they contain visual layout / CSS / SVG bloat
+                    if ($cm->modname === 'label') {
+                        $record = $DB->get_record('label', ['id' => $cm->instance]);
+                        if ($record) {
+                            $act = [
+                                'id' => (int)$cm->id,
+                                'name' => 'Etiqueta',
+                                'type' => $cm->modname,
+                                'description' => $record->intro,
+                                'settings' => []
+                            ];
+                            $sectiondata['activities'][] = $act;
+                        }
+                        continue;
+                    }
                     
                     $act = [
                         'id' => (int)$cm->id,

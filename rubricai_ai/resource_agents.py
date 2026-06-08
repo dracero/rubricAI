@@ -237,8 +237,8 @@ class YouTubeAgent:
         # Find all URL-type resources and page content that contain YouTube links
         url_resources = _extract_resources_by_type(course_data, ["url"])
 
-        # Also scan page intros for embedded YouTube links
-        pages = _extract_resources_by_type(course_data, ["page"])
+        # Also scan page and label intros for embedded YouTube links
+        pages_and_labels = _extract_resources_by_type(course_data, ["page", "label"])
 
         youtube_videos = []
 
@@ -254,17 +254,17 @@ class YouTubeAgent:
                     "video_id": video_id,
                 })
 
-        # Check page intros for embedded YouTube
-        for p in pages:
-            intro = p.get("intro", "") or p.get("content", "") or ""
-            # Find all YouTube URLs in the HTML
+        # Check page and label intros/descriptions for embedded YouTube
+        for p in pages_and_labels:
+            intro = p.get("intro", "") or p.get("content", "") or p.get("description", "") or ""
+            # Find all YouTube video IDs in the HTML using a flexible regex that supports watch, embed, v/ and youtu.be
             yt_urls = re.findall(
-                r'(?:https?://)?(?:www\.)?(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})',
+                r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/|youtube\.com/v/)([a-zA-Z0-9_-]{11})',
                 intro
             )
             for vid in yt_urls:
                 youtube_videos.append({
-                    "name": f"Video embebido en: {p.get('name', 'Página')}",
+                    "name": f"Video embebido en {p.get('type', 'actividad')}: {p.get('name', 'Página')}",
                     "section": p.get("section_name", ""),
                     "url": f"https://youtube.com/watch?v={vid}",
                     "video_id": vid,
